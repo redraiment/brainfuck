@@ -2,7 +2,7 @@
   :description "Brainfuck translator in Clojure macro, as embedded DSL."
   :url "https://github.com/redraiment/brainfuck"
   :dependencies [[org.clojure/clojure "1.11.1"]]
-  :main ^:skip-aot me.zzp.brainfuck
+  :main ^:skip-aot me.zzp.brainfuck.core
   :test-paths ["src"]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
