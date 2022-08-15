@@ -62,7 +62,8 @@
 (defn output
   "Command `.`: output the byte at the data pointer"
   []
-  (.write System/out (byte (get))))
+  (.write System/out (byte (get)))
+  (.flush System/out))
 
 (defn zero?
   "Condition of command `[`: check the byte at the data pointer is zero"
