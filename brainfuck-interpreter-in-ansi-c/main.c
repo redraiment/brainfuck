@@ -7,6 +7,9 @@
 #define STACK_SEGMENT_SIZE 1000
 #define DATA_SEGMENT_SIZE 30000
 
+#define ERROR_CODE_MISSING_FILE 1
+#define ERROR_CODE_READING_FILE 2
+
 typedef void (*Instruction)(void);
 
 /* Define a virutal machine */
@@ -99,14 +102,22 @@ void initialize() {
 /**
  * Loads source codes from file to code segment.
  */
-void load() {
+void load(char* filename) {
   int token;
-  for (int index = 0; (token = getchar()) != EOF;) {
+
+  FILE* fin = fopen(filename, "r");
+  if (fin == NULL) {
+    fprintf(stderr, "read source code from %s failed!\n", filename);
+    exit(ERROR_CODE_READING_FILE);
+  }
+
+  for (int index = 0; (token = fgetc(fin)) != EOF;) {
     if (strchr(TOKENS, token)) {
       vm.cs[index] = token;
       index++;
     }
   }
+  fclose(fin);
 }
 
 /**
@@ -120,11 +131,13 @@ void execute() {
 }
 
 int main(int argc, char* argv[]) {
-  if (argc > 1) {
-    freopen(argv[1], "r", stdin);
+  if (argc < 2) {
+    fprintf(stderr, "Usage: %s <source-file>\n", argv[0]);
+    return ERROR_CODE_MISSING_FILE;
   }
+
   initialize();
-  load();
+  load(argv[1]);
   execute();
-  return 0;
+  return EXIT_SUCCESS;
 }
