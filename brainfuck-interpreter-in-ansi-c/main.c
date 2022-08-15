@@ -42,7 +42,8 @@ void vm_decrement() {
 
 /* Command `,` */
 void vm_input() {
-  vm.ds[vm.bp] = getchar();
+  char byte = getchar();
+  vm.ds[vm.bp] = (byte != EOF) ? byte : 0; /* Set to zero if EOF */
 }
 
 /* Command `.` */
