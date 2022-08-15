@@ -9,6 +9,7 @@
 
 typedef void (*Instruction)(void);
 
+/* Define a virutal machine */
 struct {
   char cs[CODE_SEGMENT_SIZE];   /* Code Segment */
   long ip;                      /* Instruction Pointer */
@@ -19,30 +20,37 @@ struct {
   Instruction fn[128];          /* Instructions */
 } vm;
 
+/* Command `>` */
 void vm_forward() {
   vm.bp = (vm.bp + 1) % DATA_SEGMENT_SIZE;
 }
 
+/* Command `<` */
 void vm_backward() {
   vm.bp = (vm.bp + DATA_SEGMENT_SIZE - 1) % DATA_SEGMENT_SIZE;
 }
 
+/* Command `+` */
 void vm_increment() {
   vm.ds[vm.bp]++;
 }
 
+/* Command `-` */
 void vm_decrement() {
   vm.ds[vm.bp]--;
 }
 
+/* Command `,` */
 void vm_input() {
   vm.ds[vm.bp] = getchar();
 }
 
+/* Command `.` */
 void vm_output() {
   putchar(vm.ds[vm.bp]);
 }
 
+/* Command `[` */
 void vm_while_entry() {
   if (vm.ds[vm.bp]) {
     vm.ss[vm.sp] = vm.ip - 1;
@@ -60,6 +68,7 @@ void vm_while_entry() {
   }
 }
 
+/* Command `]` */
 void vm_while_exit() {
   if (vm.sp > 0) {
     vm.sp--;
@@ -70,9 +79,9 @@ void vm_while_exit() {
 }
 
 /**
- * 初始化虚拟机。
- * 1. 清空寄存器。
- * 2. 初始化指令。
+ * Initialize the Virtual Machine.
+ * 1. reset the memory to zero.
+ * 2. setup eight commands.
  */
 void initialize() {
   memset(&vm, 0, sizeof(vm));
@@ -87,7 +96,7 @@ void initialize() {
 }
 
 /**
- * 加载源码。
+ * Loads source codes from file to code segment.
  */
 void load() {
   int token;
@@ -100,7 +109,7 @@ void load() {
 }
 
 /**
- * 执行指令。
+ * Executes commands one by one.
  */
 void execute() {
   while (vm.cs[vm.ip]) {
