@@ -2,7 +2,7 @@
   "Parser: translate Brainfuck to Clojure."
   (:require [me.zzp.brainfuck.lang :as bf]))
 
-(defn- lexical-analysis
+(defn lexical-analysis
   "Scan code stream and keep EIGHT commands only"
   [stream]
   (->> stream
