@@ -54,7 +54,10 @@
 (defn input
   "Command `,`: accept one byte of input, storing its value at the data pointer"
   []
-  (set (.read System/in)))
+  (let [data (.read System/in)]
+    (set (if (= data -1)
+           0 ; set 0 when EOF
+           data))))
 
 (defn output
   "Command `.`: output the byte at the data pointer"
