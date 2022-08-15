@@ -17,7 +17,7 @@ struct {
   long sp;                      /* Stack Pointer */
   long ds[DATA_SEGMENT_SIZE];   /* Data Segment */
   long bp;                      /* Base Pointer */
-  Instruction fn[128];          /* Instructions */
+  Instruction cmds[128];        /* Instructions */
 } vm;
 
 /* Command `>` */
@@ -86,14 +86,14 @@ void vm_while_exit() {
  */
 void initialize() {
   memset(&vm, 0, sizeof(vm));
-  vm.fn['>'] = vm_forward;
-  vm.fn['<'] = vm_backward;
-  vm.fn['+'] = vm_increment;
-  vm.fn['-'] = vm_decrement;
-  vm.fn['.'] = vm_output;
-  vm.fn[','] = vm_input;
-  vm.fn['['] = vm_while_entry;
-  vm.fn[']'] = vm_while_exit;
+  vm.cmds['>'] = vm_forward;
+  vm.cmds['<'] = vm_backward;
+  vm.cmds['+'] = vm_increment;
+  vm.cmds['-'] = vm_decrement;
+  vm.cmds['.'] = vm_output;
+  vm.cmds[','] = vm_input;
+  vm.cmds['['] = vm_while_entry;
+  vm.cmds[']'] = vm_while_exit;
 }
 
 /**
@@ -114,7 +114,7 @@ void load() {
  */
 void execute() {
   while (vm.cs[vm.ip]) {
-    vm.fn[vm.cs[vm.ip]]();
+    vm.cmds[vm.cs[vm.ip]]();
     vm.ip++;
   }
 }
