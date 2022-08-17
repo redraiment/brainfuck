@@ -7,17 +7,34 @@
 #include <llvm-c/TargetMachine.h>
 
 #define SOURCE_FILE_NAME "main.bf"
-#define TARGET_DATA_LAYOUT "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+
+#define safe(expression, prompt) do {                 \
+    char* message = NULL;                             \
+    if ((expression) != 0) {                          \
+      fprintf(stderr, "%s:%s\n", (prompt), message);  \
+      LLVMDisposeMessage(message);                    \
+      exit(EXIT_FAILURE);                             \
+    }                                                 \
+  } while(0)
 
 int main(int argc, char* argv[]) {
-  LLVMContextRef context = LLVMContextCreate();
-  LLVMModuleRef module = LLVMModuleCreateWithNameInContext("brainfuck", context);
+  // Initialize target machine
+  LLVMInitializeNativeTarget();
+  LLVMInitializeNativeAsmPrinter();
+  LLVMInitializeNativeAsmParser();
+
+  LLVMTargetRef target = NULL;
+  safe(LLVMGetTargetFromTriple(LLVMGetDefaultTargetTriple(), &target, &message), "create target failed");
+  LLVMTargetMachineRef machine = LLVMCreateTargetMachine(target, LLVMGetDefaultTargetTriple(), LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(), LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault);
+  LLVMTargetDataRef layout = LLVMCreateTargetDataLayout(machine);
+
+  // Initialize Module
+  LLVMModuleRef module = LLVMModuleCreateWithName("brainfuck");
   LLVMSetSourceFileName(module, SOURCE_FILE_NAME, strlen(SOURCE_FILE_NAME));
-  LLVMSetDataLayout(module, TARGET_DATA_LAYOUT);
   LLVMSetTarget(module, LLVMGetDefaultTargetTriple());
+  LLVMSetDataLayout(module, LLVMCopyStringRepOfTargetData(layout));
 
   // define function
-
   LLVMTypeRef parameter_types[] = {
     LLVMInt32Type(),
     LLVMInt32Type()
@@ -35,33 +52,13 @@ int main(int argc, char* argv[]) {
   printf("%s", LLVMPrintModuleToString(module));
 
   // emit object file
-
-  LLVMInitializeNativeTarget();
-  LLVMInitializeNativeAsmPrinter();
-  LLVMInitializeNativeAsmParser();
-
-  char* error = NULL;
-
-  LLVMTargetRef target = NULL;
-  if (LLVMGetTargetFromTriple(LLVMGetDefaultTargetTriple(), &target, &error) != 0) {
-    fprintf(stderr, "create target failed: %s\n", error);
-    LLVMDisposeMessage(error);
-    exit(EXIT_FAILURE);
-  }
-  LLVMTargetMachineRef machine = LLVMCreateTargetMachine(target, LLVMGetDefaultTargetTriple(), LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(), LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault);
-
-  if (LLVMTargetMachineEmitToFile(machine, module, "sum.o", LLVMObjectFile, &error) != 0) {
-    fprintf(stderr, "emit object file failed: %s\n", error);
-    LLVMDisposeMessage(error);
-    exit(EXIT_FAILURE);
-  }
+  safe(LLVMTargetMachineEmitToFile(machine, module, "sum.o", LLVMObjectFile, &message), "emit object file failed");
 
   // dispose
-
+  LLVMDisposeTargetData(layout);
+  LLVMDisposeTargetMachine(machine);
   LLVMDisposeBuilder(builder);
   LLVMDisposeModule(module);
-  LLVMContextDispose(context);
-  LLVMDisposeTargetMachine(machine);
   LLVMShutdown();
 
   return 0;
