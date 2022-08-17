@@ -9,12 +9,20 @@
 #define FALSE 0
 #define TRUE 1
 
-#define SOURCE_FILE_NAME "sum.ll"
+#define PROGRAM "sum"
+#define SOURCE "sum.c"
+#define OBJECT "sum.o"
 
-#define safe(expression, prompt) do {                 \
+#define LINKER "/bin/ld"
+#define LOADER "/lib64/ld-linux-x86-64.so.2"
+#define RUNTIME_START "/lib/Scrt1.o"
+#define RUNTIME_INIT "/lib/crti.o"
+#define RUNTIME_FINI "/lib/crtn.o"
+
+#define safe(expression) do {                         \
     char* message = NULL;                             \
     if ((expression) != 0) {                          \
-      fprintf(stderr, "%s:%s\n", (prompt), message);  \
+      fprintf(stderr, "%s\n", message);               \
       LLVMDisposeMessage(message);                    \
       exit(EXIT_FAILURE);                             \
     }                                                 \
@@ -27,14 +35,14 @@ LLVMTargetMachineRef create_target_machine() {
   LLVMInitializeNativeAsmParser();
 
   LLVMTargetRef target = NULL;
-  safe(LLVMGetTargetFromTriple(LLVMGetDefaultTargetTriple(), &target, &message), "create target failed");
+  safe(LLVMGetTargetFromTriple(LLVMGetDefaultTargetTriple(), &target, &message));
   return LLVMCreateTargetMachine(target, LLVMGetDefaultTargetTriple(), LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(), LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault);
 }
 
 LLVMModuleRef create_module(LLVMTargetDataRef layout) {
   // Initialize Module
-  LLVMModuleRef module = LLVMModuleCreateWithName(SOURCE_FILE_NAME);
-  LLVMSetSourceFileName(module, SOURCE_FILE_NAME, strlen(SOURCE_FILE_NAME));
+  LLVMModuleRef module = LLVMModuleCreateWithName(PROGRAM);
+  LLVMSetSourceFileName(module, SOURCE, strlen(SOURCE));
   LLVMSetTarget(module, LLVMGetDefaultTargetTriple());
   LLVMSetDataLayout(module, LLVMCopyStringRepOfTargetData(layout));
   return module;
@@ -108,21 +116,38 @@ LLVMValueRef define_main(
   return main;
 }
 
+void emit_object_file(LLVMTargetMachineRef machine, LLVMModuleRef module) {
+#ifdef DEBUG
+  printf("%s", LLVMPrintModuleToString(module));
+#endif
+  safe(LLVMTargetMachineEmitToFile(machine, module, OBJECT, LLVMObjectFile, &message));
+}
+
+void link() {
+  char cmd[512] = {0};
+  sprintf(cmd,
+          "%s -dynamic-linker %s -lc %s %s %s %s -o %s",
+          LINKER, LOADER,
+          RUNTIME_START, RUNTIME_INIT, OBJECT, RUNTIME_FINI,
+          PROGRAM);
+  system(cmd);
+}
+
 int main(int argc, char* argv[]) {
+  // initialize
   LLVMTargetMachineRef machine = create_target_machine();
   LLVMTargetDataRef layout = LLVMCreateTargetDataLayout(machine);
   LLVMModuleRef module = create_module(layout);
-
-  LLVMValueRef fn_printf = declare_printf(module);
-
   LLVMBuilderRef builder = LLVMCreateBuilder();
+
+  // build
+  LLVMValueRef fn_printf = declare_printf(module);
   LLVMValueRef fn_sum = define_sum(module, builder);
   define_main(module, builder, fn_printf, fn_sum);
 
-  printf("%s", LLVMPrintModuleToString(module));
-
-  // emit object file
-  safe(LLVMTargetMachineEmitToFile(machine, module, "hello.o", LLVMObjectFile, &message), "emit object file failed");
+  // output
+  emit_object_file(machine, module);
+  link();
 
   // dispose
   LLVMDisposeBuilder(builder);

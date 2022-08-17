@@ -14,6 +14,6 @@ $(PROGRAM): $(OBJECTS)
 	$(CC) -c $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f $(PROGRAM) $(OBJECTS)
+	rm -f $(PROGRAM) $(OBJECTS) sum*
 
 .PHONY: clean all
