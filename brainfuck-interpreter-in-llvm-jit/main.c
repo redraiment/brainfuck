@@ -89,7 +89,7 @@ LLVMValueRef call(LLVMBuilderRef builder, Symbols symbol, int count, LLVMValueRe
   return LLVMBuildCall2(builder, type, fn, parameters, count, "");
 }
 
-LLVMValueRef define_main(
+void define_main(
   LLVMModuleRef module,
   LLVMBuilderRef builder
 ) {
@@ -109,7 +109,9 @@ LLVMValueRef define_main(
   });
 
   LLVMBuildRet(builder, LLVMConstInt(LLVMInt32Type(), 0, FALSE));
-  return main;
+
+  SymbolTable.types[symbol_main] = type;
+  SymbolTable.values[symbol_main] = main;
 }
 
 void emit_object_file(LLVMTargetMachineRef machine, LLVMModuleRef module) {
