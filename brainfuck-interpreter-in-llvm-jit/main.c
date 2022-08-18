@@ -30,6 +30,7 @@
 
 typedef enum {
   s_printf = 0,
+  s_scanf,
   s_sum,
   s_main,
   s_size
@@ -79,6 +80,12 @@ void declare_printf(LLVMModuleRef module) {
   }, 1, 1));
 }
 
+void declare_scanf(LLVMModuleRef module) {
+  declare(module, s_scanf, "scanf", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){
+    LLVMPointerType(LLVMInt8Type(), 0)
+  }, 1, 1));
+}
+
 void define_sum(LLVMModuleRef module, LLVMBuilderRef builder) {
   LLVMValueRef sum = declare(module, s_sum, "sum", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){
     LLVMInt32Type(),
@@ -99,22 +106,28 @@ void define_main(
   LLVMBasicBlockRef body = LLVMAppendBasicBlock(main, "");
   LLVMPositionBuilderAtEnd(builder, body);
 
-  LLVMValueRef result = call(builder, s_sum, 2, (LLVMValueRef[]){
-    LLVMConstInt(LLVMInt32Type(), 1, FALSE),
-    LLVMConstInt(LLVMInt32Type(), 2, FALSE)
+  LLVMValueRef pa = LLVMBuildAlloca(builder, LLVMInt32Type(), "");
+  LLVMValueRef pb = LLVMBuildAlloca(builder, LLVMInt32Type(), "");
+  call(builder, s_scanf, 3, (LLVMValueRef[]){
+      LLVMBuildGlobalStringPtr(builder, "%d %d", ""),
+      pa, pb
   });
-  call(builder, s_printf, 2, (LLVMValueRef[]){
-    LLVMBuildGlobalStringPtr(builder, "sum of 1 + 2 = %d!\n", ""),
-    result
+  LLVMValueRef a = LLVMBuildLoad2(builder, LLVMInt32Type(), pa, "");
+  LLVMValueRef b = LLVMBuildLoad2(builder, LLVMInt32Type(), pb, "");
+  LLVMValueRef result = call(builder, s_sum, 2, (LLVMValueRef[]){
+      a, b
+  });
+  call(builder, s_printf, 4, (LLVMValueRef[]){
+      LLVMBuildGlobalStringPtr(builder, "sum of %d + %d = %d!\n", ""),
+      a, b,
+      result
   });
 
   LLVMBuildRet(builder, LLVMConstInt(LLVMInt32Type(), 0, FALSE));
 }
 
 void emit_object_file(LLVMTargetMachineRef machine, LLVMModuleRef module) {
-#ifdef DEBUG
   printf("%s", LLVMPrintModuleToString(module));
-#endif
   safe(LLVMTargetMachineEmitToFile(machine, module, OBJECT, LLVMObjectFile, &message));
 }
 
@@ -137,6 +150,7 @@ int main(int argc, char* argv[]) {
 
   // build
   declare_printf(module);
+  declare_scanf(module);
   define_sum(module, builder);
   define_main(module, builder);
 
