@@ -40,6 +40,12 @@ struct {
   LLVMValueRef values[symbol_size];
 } SymbolTable;
 
+LLVMValueRef call(LLVMBuilderRef builder, Symbols symbol, int count, LLVMValueRef parameters[]) {
+  LLVMTypeRef type = SymbolTable.types[symbol];
+  LLVMValueRef fn = SymbolTable.values[symbol];
+  return LLVMBuildCall2(builder, type, fn, parameters, count, "");
+}
+
 LLVMTargetMachineRef create_target_machine() {
   // Initialize target machine
   LLVMInitializeNativeTarget();
@@ -81,12 +87,6 @@ void define_sum(LLVMModuleRef module, LLVMBuilderRef builder) {
 
   SymbolTable.types[symbol_sum] = type;
   SymbolTable.values[symbol_sum] = sum;
-}
-
-LLVMValueRef call(LLVMBuilderRef builder, Symbols symbol, int count, LLVMValueRef parameters[]) {
-  LLVMTypeRef type = SymbolTable.types[symbol];
-  LLVMValueRef fn = SymbolTable.values[symbol];
-  return LLVMBuildCall2(builder, type, fn, parameters, count, "");
 }
 
 void define_main(
