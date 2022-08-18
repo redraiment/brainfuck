@@ -28,6 +28,18 @@
     }                                                 \
   } while(0)
 
+typedef enum {
+  symbol_printf = 0,
+  symbol_sum,
+  symbol_main,
+  symbol_size
+} Symbols;
+
+struct {
+  LLVMTypeRef types[symbol_size];
+  LLVMValueRef values[symbol_size];
+} SymbolTable;
+
 LLVMTargetMachineRef create_target_machine() {
   // Initialize target machine
   LLVMInitializeNativeTarget();
@@ -51,7 +63,12 @@ LLVMModuleRef create_module(LLVMTargetDataRef layout) {
 LLVMValueRef declare_printf(LLVMModuleRef module) {
   LLVMTypeRef arguments[] = { LLVMPointerType(LLVMInt8Type(), 0) };
   LLVMTypeRef type = LLVMFunctionType(LLVMInt32Type(), arguments, 1, 1);
-  return LLVMAddFunction(module, "printf", type);
+  LLVMValueRef printf = LLVMAddFunction(module, "printf", type);
+
+  SymbolTable.types[symbol_printf] = type;
+  SymbolTable.values[symbol_printf] = printf;
+
+  return printf;
 }
 
 LLVMValueRef define_sum(LLVMModuleRef module, LLVMBuilderRef builder) {
@@ -64,17 +81,19 @@ LLVMValueRef define_sum(LLVMModuleRef module, LLVMBuilderRef builder) {
   LLVMValueRef result = LLVMBuildAdd(builder, LLVMGetParam(sum, 0), LLVMGetParam(sum, 1), "");
   LLVMBuildRet(builder, result);
 
+  SymbolTable.types[symbol_sum] = type;
+  SymbolTable.values[symbol_sum] = sum;
+
   return sum;
 }
 
 LLVMValueRef call_sum(
   LLVMBuilderRef builder,
-  LLVMValueRef sum,
   int left,
   int right
 ) {
-  LLVMTypeRef arguments[] = { LLVMInt32Type(), LLVMInt32Type() };
-  LLVMTypeRef type = LLVMFunctionType(LLVMInt32Type(), arguments, 2, 0);
+  LLVMTypeRef type = SymbolTable.types[symbol_sum];
+  LLVMValueRef sum = SymbolTable.values[symbol_sum];
   LLVMValueRef parameters[] = {
     LLVMConstInt(LLVMInt32Type(), left, FALSE),
     LLVMConstInt(LLVMInt32Type(), right, FALSE)
@@ -84,12 +103,11 @@ LLVMValueRef call_sum(
 
 LLVMValueRef call_printf(
   LLVMBuilderRef builder,
-  LLVMValueRef printf,
   char* template,
   LLVMValueRef result
 ) {
-  LLVMTypeRef arguments[] = { LLVMPointerType(LLVMInt8Type(), 0) };
-  LLVMTypeRef type = LLVMFunctionType(LLVMInt32Type(), arguments, 1, 1);
+  LLVMTypeRef type = SymbolTable.types[symbol_printf];
+  LLVMValueRef printf = SymbolTable.values[symbol_printf];
   LLVMValueRef parameters[] = {
     LLVMBuildGlobalStringPtr(builder, template, ""),
     result
@@ -99,9 +117,7 @@ LLVMValueRef call_printf(
 
 LLVMValueRef define_main(
   LLVMModuleRef module,
-  LLVMBuilderRef builder,
-  LLVMValueRef fn_printf,
-  LLVMValueRef fn_sum
+  LLVMBuilderRef builder
 ) {
   LLVMTypeRef arguments[] = {};
   LLVMTypeRef type = LLVMFunctionType(LLVMInt32Type(), arguments, 0, 0);
@@ -109,8 +125,8 @@ LLVMValueRef define_main(
   LLVMBasicBlockRef body = LLVMAppendBasicBlock(main, "");
 
   LLVMPositionBuilderAtEnd(builder, body);
-  LLVMValueRef result = call_sum(builder, fn_sum, 1, 2);
-  call_printf(builder, fn_printf, "sum of 1 + 2 = %d!\n", result);
+  LLVMValueRef result = call_sum(builder, 1, 2);
+  call_printf(builder, "sum of 1 + 2 = %d!\n", result);
 
   LLVMBuildRet(builder, LLVMConstInt(LLVMInt32Type(), 0, FALSE));
   return main;
@@ -141,9 +157,9 @@ int main(int argc, char* argv[]) {
   LLVMBuilderRef builder = LLVMCreateBuilder();
 
   // build
-  LLVMValueRef fn_printf = declare_printf(module);
-  LLVMValueRef fn_sum = define_sum(module, builder);
-  define_main(module, builder, fn_printf, fn_sum);
+  declare_printf(module);
+  define_sum(module, builder);
+  define_main(module, builder);
 
   // output
   emit_object_file(machine, module);
