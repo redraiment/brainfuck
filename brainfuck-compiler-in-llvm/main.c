@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "llvm.h"
 #include "lang.h"
@@ -18,84 +17,46 @@ int main(int argc, char* argv[]) {
   LLVMSetUp(source);
   BrainfuckSetUp();
 
-  // main {
-  update(10);
-
-  // while {
-  whileNotZero(); {
-    move(1);
-    update(7);
-
-    move(1);
-    update(10);
-  
-    move(1);
-    update(3);
-  
-    move(1);
-    update(1);
-  
-    move(-4);
-    update(-1);
+  FILE* fin = fopen(source, "r");
+  if (fin == NULL) {
+    fprintf(stderr, "Open source file %s failed!\n", source);
+    exit(EXIT_FAILURE);
   }
-  // while }
-  whileEnd();
 
-  // H
-  move(1);
-  update(2);
-  output();
+  int command = 0;
+  while ((command = fgetc(fin)) != EOF) {
+    switch (command) {
+    case '>':
+      move(1);
+      break;
+    case '<':
+      move(-1);
+      break;
+    case '+':
+      update(1);
+      break;
+    case '-':
+      update(-1);
+      break;
+    case ',':
+      input();
+      break;
+    case '.':
+      output();
+      break;
+    case '[':
+      whileNotZero();
+      break;
+    case ']':
+      whileEnd();
+      break;
+    default:
+      /* Ignore Unknown command */
+      break;
+    }
+  }
 
-  // e
-  move(1);
-  update(1);
-  output();
-
-  // l
-  update(7);
-  output();
-
-  // l
-  output();
-
-  // o
-  update(3);
-  output();
-
-  // \space
-  move(1);
-  update(2);
-  output();
-
-  // W
-  move(-2);
-  update(15);
-  output();
-
-  // o
-  move(1);
-  output();
-
-  // r
-  update(3);
-  output();
-
-  // l
-  update(-6);
-  output();
-
-  // d
-  update(-8);
-  output();
-
-  // !
-  move(1);
-  update(1);
-  output();
-
-  // \newline
-  move(1);
-  output();
+  fclose(fin);
 
   // main }
   returnWith(Int32(0));
