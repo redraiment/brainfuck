@@ -16,7 +16,7 @@ static LLVMModuleRef module = NULL;
 /* inner default builder. */
 static LLVMBuilderRef builder = NULL;
 
-/* Obtains the builder. */
+/* Obtain the builder. */
 LLVMBuilderRef Builder() {
   return builder;
 }
@@ -38,10 +38,10 @@ static void LLVMTearDown(void) {
 }
 
 /**
- * Initializes LLVM target machine with given source filename.
- * - creates target machine.
- * - creates module.
- * - creates builder.
+ * Initialize LLVM target machine with given source filename.
+ * - create target machine.
+ * - create module.
+ * - create builder.
  */
 void LLVMSetUp(char* filename) {
   // Initialize target machine
@@ -85,6 +85,15 @@ LLVMValueRef DeclareGlobalVariable(char* name, LLVMTypeRef type) {
 }
 
 /**
+ * Add global variable with initial value to default module.
+ */
+LLVMValueRef DeclareGlobalVariableWithValue(char* name, LLVMTypeRef type, LLVMValueRef value) {
+  LLVMValueRef variable = DeclareGlobalVariable(name, type);
+  LLVMSetInitializer(variable, value);
+  return variable;
+}
+
+/**
  * Add global function to default module.
  */
 LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
@@ -92,7 +101,22 @@ LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
 }
 
 /**
- * Emits object file for the module to given filename.
+ * Create an integer array with given type and length, and initialized to zero.
+ */
+LLVMValueRef ConstZeroArray(LLVMTypeRef elementType, int length) {
+  LLVMTypeRef type = LLVMArrayType(elementType, length);
+  LLVMValueRef zero = LLVMConstInt(elementType, 0, False);
+  LLVMValueRef values[length];
+  for (int index = 0; index < length; index++) {
+    values[index] = zero;
+  }
+  return LLVMConstArray(elementType, values, length);
+}
+
+
+
+/**
+ * Emit object file for the module to given filename.
  */
 void EmitObjectFile(char* filename) {
   char* message = NULL;

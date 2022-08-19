@@ -43,15 +43,9 @@ void DeclarePutchar() {
  * Creates global data segment and returns the data pointer.
  */
 LLVMValueRef CreateDataSegment() {
-  LLVMTypeRef type = Int8Array(DATA_SEGMENT_SIZE);
-  LLVMValueRef ds = DeclareGlobalVariable("ds", type);
-  LLVMValueRef array[DATA_SEGMENT_SIZE];
-  for (int index = 0; index < DATA_SEGMENT_SIZE; index++) {
-    array[index] = Int8(0);
-  }
-  LLVMValueRef zeroinitializer = LLVMConstArray(LLVMInt8Type(), array, DATA_SEGMENT_SIZE);
-  LLVMSetInitializer(ds, zeroinitializer);
-
+  LLVMTypeRef elementType = LLVMInt8Type();
+  LLVMTypeRef type = LLVMArrayType(elementType, DATA_SEGMENT_SIZE);
+  LLVMValueRef ds = DeclareGlobalVariableWithValue("ds", type, ConstZeroArray(elementType, DATA_SEGMENT_SIZE));
   return LLVMBuildGEP2(Builder(), type, ds, (LLVMValueRef[]){ Int32(0), Int32(0) }, 2, "");
 }
 

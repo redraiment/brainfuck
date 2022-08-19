@@ -18,16 +18,16 @@
   } while(False)
 
 #define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), False)
-#define Int32Array(n) LLVMArrayType(LLVMInt32Type(), (n))
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
-#define Int8Array(n) LLVMArrayType(LLVMInt8Type(), (n))
 
 void LLVMSetUp(char*);
 
 LLVMBuilderRef Builder(void);
 
 LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
+LLVMValueRef DeclareGlobalVariableWithValue(char*, LLVMTypeRef, LLVMValueRef);
 LLVMValueRef DeclareFunction(char*, LLVMTypeRef);
+LLVMValueRef ConstZeroArray(LLVMTypeRef, int);
 
 void EmitObjectFile(char*);
 
