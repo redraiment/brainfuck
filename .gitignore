@@ -1,6 +1,7 @@
+# For Clojure Project
+
 target/
 classes/
-checkouts/
 profiles.clj
 pom.xml
 pom.xml.asc
@@ -11,3 +12,8 @@ pom.xml.asc
 .prepl-port
 .hgignore
 .hg/
+
+# For C Project
+
+*.o
+*.ll
