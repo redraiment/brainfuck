@@ -201,7 +201,7 @@ void input(void) {
   LLVMValueRef value = invoke(s_getchar, 0, (LLVMValueRef[]){});
   value = invoke(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
   value = truncate(value, LLVMInt8Type());
-  store(value, dp);
+  store(dp, value);
 }
 
 /**
