@@ -22,12 +22,31 @@
 
 void LLVMSetUp(char*);
 
-LLVMBuilderRef Builder(void);
-
 LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
 LLVMValueRef DeclareGlobalVariableWithValue(char*, LLVMTypeRef, LLVMValueRef);
 LLVMValueRef DeclareFunction(char*, LLVMTypeRef);
+
 LLVMValueRef ConstZeroArray(LLVMTypeRef, int);
+
+LLVMValueRef call(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
+LLVMBasicBlockRef Block(LLVMValueRef);
+void enter(LLVMBasicBlockRef);
+
+LLVMValueRef Pointer(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
+LLVMValueRef load(LLVMTypeRef, LLVMValueRef);
+void store(LLVMValueRef, LLVMValueRef);
+
+LLVMValueRef add(LLVMValueRef, LLVMValueRef);
+LLVMValueRef sub(LLVMValueRef, LLVMValueRef);
+LLVMValueRef compare(LLVMIntPredicate, LLVMValueRef, LLVMValueRef);
+
+void when(LLVMValueRef, LLVMBasicBlockRef, LLVMBasicBlockRef);
+void jumpTo(LLVMBasicBlockRef);
+void returnWith(LLVMValueRef);
+void returnVoid();
+
+LLVMValueRef extend(LLVMValueRef, LLVMTypeRef);
+LLVMValueRef truncate(LLVMValueRef, LLVMTypeRef);
 
 void EmitObjectFile(char*);
 

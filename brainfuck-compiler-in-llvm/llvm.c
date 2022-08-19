@@ -16,11 +16,6 @@ static LLVMModuleRef module = NULL;
 /* inner default builder. */
 static LLVMBuilderRef builder = NULL;
 
-/* Obtain the builder. */
-LLVMBuilderRef Builder() {
-  return builder;
-}
-
 /**
  * Destroy all LLVM resources.
  */
@@ -77,6 +72,8 @@ void LLVMSetUp(char* filename) {
   atexit(LLVMTearDown);
 }
 
+/* Global Declarations */
+
 /**
  * Add global variable to default module.
  */
@@ -100,6 +97,8 @@ LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
   return LLVMAddFunction(module, name, type);
 }
 
+/* Global Variables */
+
 /**
  * Create an integer array with given type and length, and initialized to zero.
  */
@@ -113,7 +112,122 @@ LLVMValueRef ConstZeroArray(LLVMTypeRef elementType, int length) {
   return LLVMConstArray(elementType, values, length);
 }
 
+/* Function Operations */
 
+/**
+ * Build call function.
+ */
+LLVMValueRef call(LLVMTypeRef type, LLVMValueRef fn, int length, LLVMValueRef* parameters) {
+  return LLVMBuildCall2(builder, type, fn, parameters, length, "");
+}
+
+/**
+ * Append a basic block to given function.
+ */
+LLVMBasicBlockRef Block(LLVMValueRef fn) {
+  return LLVMAppendBasicBlock(fn, "");
+}
+
+/**
+ * Move builder position to end of given block.
+ */
+void enter(LLVMBasicBlockRef block) {
+  LLVMPositionBuilderAtEnd(builder, block);
+}
+
+/* Pointer Operations */
+
+/**
+ * Build get element pointer.
+ */
+LLVMValueRef Pointer(LLVMTypeRef type, LLVMValueRef pointer, int length, LLVMValueRef* offset) {
+  return LLVMBuildGEP2(builder, type, pointer, offset, length, "");
+}
+
+/**
+ * Load value from the pointer.
+ */
+LLVMValueRef load(LLVMTypeRef type, LLVMValueRef pointer) {
+  return LLVMBuildLoad2(builder, type, pointer, "");
+}
+
+/**
+ * Save value to the pointer.
+ */
+void store(LLVMValueRef pointer, LLVMValueRef value) {
+  LLVMBuildStore(builder, value, pointer);
+}
+
+/* Arithmetic Operations */
+
+/**
+ * Build plus.
+ */
+LLVMValueRef add(LLVMValueRef left, LLVMValueRef right) {
+  return LLVMBuildAdd(builder, left, right, "");
+}
+
+/**
+ * Build minus.
+ */
+LLVMValueRef sub(LLVMValueRef left, LLVMValueRef right) {
+  return LLVMBuildSub(builder, left, right, "");
+}
+
+/**
+ * Build compare.
+ */
+LLVMValueRef compare(LLVMIntPredicate predicate, LLVMValueRef left, LLVMValueRef right) {
+  return LLVMBuildICmp(builder, predicate, left, right, "");
+}
+
+/* Control Operations */
+
+/**
+ * Build condition branch.
+ */
+void when(LLVMValueRef condition, LLVMBasicBlockRef then, LLVMBasicBlockRef otherwise) {
+  LLVMBuildCondBr(builder, condition, then, otherwise);
+}
+
+/**
+ * Build branch.
+ */
+void jumpTo(LLVMBasicBlockRef label) {
+  LLVMBuildBr(builder, label);
+}
+
+/**
+ * Build return a value.
+ */
+void returnWith(LLVMValueRef value) {
+  LLVMBuildRet(builder, value);
+}
+
+/**
+ * Build return void.
+ */
+void returnVoid() {
+  LLVMBuildRetVoid(builder);
+}
+
+/* Conversion Operations */
+
+/**
+ * Sign extends type.
+ */
+LLVMValueRef extend(LLVMValueRef value, LLVMTypeRef type) {
+  return LLVMBuildSExt(builder, value, type, "");
+}
+
+/**
+ * Truncate type.
+ */
+LLVMValueRef truncate(LLVMValueRef value, LLVMTypeRef type) {
+  return LLVMBuildTrunc(builder, value, type, "");
+}
+
+/* Object File */
 
 /**
  * Emit object file for the module to given filename.
