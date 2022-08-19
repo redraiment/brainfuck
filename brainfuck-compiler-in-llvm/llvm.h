@@ -24,8 +24,9 @@
 
 void LLVMSetUp(char*);
 
-LLVMTargetMachineRef TargetMachine(void);
 LLVMModuleRef Module(void);
 LLVMBuilderRef Builder(void);
+
+void EmitObjectFile(char*);
 
 #endif

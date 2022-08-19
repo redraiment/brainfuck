@@ -16,11 +16,6 @@ static LLVMModuleRef module = NULL;
 /* inner default builder. */
 static LLVMBuilderRef builder = NULL;
 
-/* Obtains the default target machine. */
-LLVMTargetMachineRef TargetMachine() {
-  return machine;
-}
-
 /* Obtains the default module. */
 LLVMModuleRef Module() {
   return module;
@@ -48,13 +43,12 @@ static void LLVMTearDown(void) {
 }
 
 /**
- * Initialize LLVM target machine with given source file name.
- * - create target machine.
- * - create target data layout.
- * - create module.
- * - create builder.
+ * Initializes LLVM target machine with given source filename.
+ * - creates target machine.
+ * - creates module.
+ * - creates builder.
  */
-void LLVMSetUp(char* name) {
+void LLVMSetUp(char* filename) {
   // Initialize target machine
   LLVMInitializeNativeTarget();
   LLVMInitializeNativeAsmPrinter();
@@ -75,8 +69,8 @@ void LLVMSetUp(char* name) {
     LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault
   );
 
-  module = LLVMModuleCreateWithName(name);
-  LLVMSetSourceFileName(module, name, strlen(name));
+  module = LLVMModuleCreateWithName(filename);
+  LLVMSetSourceFileName(module, filename, strlen(filename));
   LLVMSetTarget(module, triple);
 
   LLVMTargetDataRef layout = LLVMCreateTargetDataLayout(machine);
@@ -86,4 +80,16 @@ void LLVMSetUp(char* name) {
   builder = LLVMCreateBuilder();
 
   atexit(LLVMTearDown);
+}
+
+/**
+ * Emits object file for the module to given filename.
+ */
+void EmitObjectFile(char* filename) {
+  char* message = NULL;
+  if (LLVMTargetMachineEmitToFile(machine, module, filename, LLVMObjectFile, &message) != 0) {
+    fprintf(stderr, "LLVM emit object file failed: %s\n", message);
+    LLVMDisposeMessage(message);
+    exit(EXIT_FAILURE);
+  }
 }

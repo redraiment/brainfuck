@@ -39,18 +39,6 @@ void DeclarePutchar() {
   declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
 }
 
-void EmitObjectFile(char* sourceFileName) {
-  char* end = strrchr(sourceFileName, '.');
-  int length = end != NULL? (end - sourceFileName) : strlen(sourceFileName);
-  char objectFileName[length + 2];
-  strncpy(objectFileName, sourceFileName, length);
-  objectFileName[length] = '.';
-  objectFileName[length + 1] = 'o';
-  objectFileName[length + 2] = 0;
-
-  safe(LLVMTargetMachineEmitToFile(TargetMachine(), Module(), objectFileName, LLVMObjectFile, &message));
-}
-
 /**
  * Creates global data segment and returns the data pointer.
  */
@@ -93,13 +81,16 @@ void output(LLVMValueRef dp) {
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "Usage: %s <source-file>\n", argv[0]);
+  if (argc != 3) {
+    fprintf(stderr, "Usage: %s <source-file> <object-file>\n", argv[0]);
     exit(EXIT_FAILURE);
   }
 
+  char* source = argv[1]; /* source filename */
+  char* object = argv[2]; /* object filename */
+
   // initialize
-  LLVMSetUp(argv[1]);
+  LLVMSetUp(source);
   DeclareGetchar();
   DeclarePutchar();
   LLVMValueRef dp = CreateDataSegment();
@@ -201,7 +192,7 @@ int main(int argc, char* argv[]) {
   LLVMBuildRet(Builder(), Int32(0));
 
   // output
-  EmitObjectFile(argv[1]);
+  EmitObjectFile(object);
 
   return 0;
 }
