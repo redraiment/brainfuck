@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ $# -lt 2 ]; then
-  echo "Usage: compile <source-file> <target-file>" >&2
+  echo "Usage: $0 <source-file> <target-file>" >&2
   exit 1
 fi
 
-compiler="$(dirname "$0")/brainfuck"
+compiler="$(dirname "$0")/compiler"
 
 source_filename=$1
 object_filename=$(mktemp --dry-run -q --suffix '.o')

@@ -1,4 +1,4 @@
-PROGRAM := brainfuck
+PROGRAM := compiler
 OBJECTS := main.o lang.o llvm.o
 
 CC := clang
