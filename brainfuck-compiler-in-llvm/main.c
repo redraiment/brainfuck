@@ -3,74 +3,7 @@
 #include <stdlib.h>
 
 #include "llvm.h"
-
-#define DATA_SEGMENT_SIZE 30000
-
-typedef enum {
-  s_getchar = 0,
-  s_putchar,
-  s_main,
-  s_size
-} Symbol;
-
-struct {
-  LLVMTypeRef types[s_size];
-  LLVMValueRef values[s_size];
-} SymbolTable;
-
-LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
-  LLVMValueRef fn = DeclareFunction(name, type);
-  SymbolTable.types[symbol] = type;
-  SymbolTable.values[symbol] = fn;
-  return fn;
-}
-
-LLVMValueRef call1(Symbol symbol, int count, LLVMValueRef parameters[]) {
-  LLVMTypeRef type = SymbolTable.types[symbol];
-  LLVMValueRef fn = SymbolTable.values[symbol];
-  return call(type, fn, count, parameters);
-}
-
-void DeclareGetchar() {
-  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-}
-
-void DeclarePutchar() {
-  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
-}
-
-/**
- * Creates global data segment and returns the data pointer.
- */
-LLVMValueRef CreateDataSegment() {
-  LLVMTypeRef elementType = LLVMInt8Type();
-  LLVMTypeRef type = LLVMArrayType(elementType, DATA_SEGMENT_SIZE);
-  LLVMValueRef ds = DeclareGlobalVariableWithValue("ds", type, ConstZeroArray(elementType, DATA_SEGMENT_SIZE));
-  return Pointer(type, ds, 2, (LLVMValueRef[]){ Int32(0), Int32(0) });
-}
-
-/**
- * Move data pointer.
- */
-LLVMValueRef shift(LLVMValueRef dp, int offset) {
-  return Pointer(LLVMInt8Type(), dp, 1, (LLVMValueRef[]){ Int32(offset) });
-}
-
-void update(LLVMValueRef dp, int offset) {
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
-  if (offset > 0) {
-    value = add(value, Int8(offset));
-  } else if (offset < 0) {
-    value = sub(value, Int8(-offset));
-  }
-  store(dp, value);
-}
-
-void output(LLVMValueRef dp) {
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
-  LLVMValueRef charactor = extend(value, LLVMInt32Type());
-  call1(s_putchar, 1, (LLVMValueRef[]){ charactor });
-}
+#include "lang.h"
 
 int main(int argc, char* argv[]) {
   if (argc != 3) {
@@ -83,102 +16,86 @@ int main(int argc, char* argv[]) {
 
   // initialize
   LLVMSetUp(source);
-  DeclareGetchar();
-  DeclarePutchar();
-  LLVMValueRef dp = CreateDataSegment();
+  BrainfuckSetUp();
 
   // main {
-  LLVMValueRef main = declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  enter(Block(main));
-
-  update(dp, 10);
+  update(10);
 
   // while {
-  LLVMBasicBlockRef entry = Block(main);
-  LLVMBasicBlockRef body = Block(main);
-  LLVMBasicBlockRef end = Block(main);
-  jumpTo(entry);
+  whileNotZero(); {
+    move(1);
+    update(7);
 
-  enter(entry);
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
-  LLVMValueRef condition = compare(LLVMIntNE, value, Int8(0));
-  when(condition, body, end);
-
-  enter(body);
-  dp = shift(dp, 1);
-  update(dp, 7);
-
-  dp = shift(dp, 1);
-  update(dp, 10);
+    move(1);
+    update(10);
   
-  dp = shift(dp, 1);
-  update(dp, 3);
+    move(1);
+    update(3);
   
-  dp = shift(dp, 1);
-  update(dp, 1);
+    move(1);
+    update(1);
   
-  dp = shift(dp, -4);
-  update(dp, -1);
-  jumpTo(entry);
-
+    move(-4);
+    update(-1);
+  }
   // while }
-  enter(end);
+  whileEnd();
 
   // H
-  dp = shift(dp, 1);
-  update(dp, 2);
-  output(dp);
+  move(1);
+  update(2);
+  output();
 
   // e
-  dp = shift(dp, 1);
-  update(dp, 1);
-  output(dp);
+  move(1);
+  update(1);
+  output();
 
   // l
-  update(dp, 7);
-  output(dp);
+  update(7);
+  output();
 
   // l
-  output(dp);
+  output();
 
   // o
-  update(dp, 3);
-  output(dp);
+  update(3);
+  output();
 
   // \space
-  dp = shift(dp, 1);
-  update(dp, 2);
-  output(dp);
+  move(1);
+  update(2);
+  output();
 
   // W
-  dp = shift(dp, -2);
-  update(dp, 15);
-  output(dp);
+  move(-2);
+  update(15);
+  output();
 
   // o
-  dp = shift(dp, 1);
-  output(dp);
+  move(1);
+  output();
 
   // r
-  update(dp, 3);
-  output(dp);
+  update(3);
+  output();
 
   // l
-  update(dp, -6);
-  output(dp);
+  update(-6);
+  output();
 
   // d
-  update(dp, -8);
-  output(dp);
+  update(-8);
+  output();
 
   // !
-  dp = shift(dp, 1);
-  update(dp, 1);
-  output(dp);
+  move(1);
+  update(1);
+  output();
 
   // \newline
-  dp = shift(dp, 1);
-  output(dp);
+  move(1);
+  output();
 
   // main }
   returnWith(Int32(0));
