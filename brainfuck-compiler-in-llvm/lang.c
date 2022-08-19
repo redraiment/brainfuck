@@ -116,8 +116,8 @@ static void CreateDataSegment() {
  * Create basic block and append to main function.
  */
 static LLVMBasicBlockRef CreateBlock() {
-  LLVMValueRef main = SymbolTable.values[s_main];
-  return Block(main);
+  LLVMValueRef fn = SymbolTable.values[s_main];
+  return Block(fn);
 }
 
 /**
