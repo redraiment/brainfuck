@@ -24,8 +24,10 @@
 
 void LLVMSetUp(char*);
 
-LLVMModuleRef Module(void);
 LLVMBuilderRef Builder(void);
+
+LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
+LLVMValueRef DeclareFunction(char*, LLVMTypeRef);
 
 void EmitObjectFile(char*);
 

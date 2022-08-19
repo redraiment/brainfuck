@@ -19,7 +19,7 @@ struct {
 } SymbolTable;
 
 LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
-  LLVMValueRef fn = LLVMAddFunction(Module(), name, type);
+  LLVMValueRef fn = DeclareFunction(name, type);
   SymbolTable.types[symbol] = type;
   SymbolTable.values[symbol] = fn;
   return fn;
@@ -44,7 +44,7 @@ void DeclarePutchar() {
  */
 LLVMValueRef CreateDataSegment() {
   LLVMTypeRef type = Int8Array(DATA_SEGMENT_SIZE);
-  LLVMValueRef ds = LLVMAddGlobal(Module(), type, "ds");
+  LLVMValueRef ds = DeclareGlobalVariable("ds", type);
   LLVMValueRef array[DATA_SEGMENT_SIZE];
   for (int index = 0; index < DATA_SEGMENT_SIZE; index++) {
     array[index] = Int8(0);

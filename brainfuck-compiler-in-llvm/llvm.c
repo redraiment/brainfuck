@@ -16,11 +16,6 @@ static LLVMModuleRef module = NULL;
 /* inner default builder. */
 static LLVMBuilderRef builder = NULL;
 
-/* Obtains the default module. */
-LLVMModuleRef Module() {
-  return module;
-}
-
 /* Obtains the builder. */
 LLVMBuilderRef Builder() {
   return builder;
@@ -80,6 +75,20 @@ void LLVMSetUp(char* filename) {
   builder = LLVMCreateBuilder();
 
   atexit(LLVMTearDown);
+}
+
+/**
+ * Add global variable to default module.
+ */
+LLVMValueRef DeclareGlobalVariable(char* name, LLVMTypeRef type) {
+  return LLVMAddGlobal(module, type, name);
+}
+
+/**
+ * Add global function to default module.
+ */
+LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
+  return LLVMAddFunction(module, name, type);
 }
 
 /**
