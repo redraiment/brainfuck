@@ -19,7 +19,7 @@ struct {
 } SymbolTable;
 
 LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
-  LLVMValueRef fn = LLVMAddFunction(module, name, type);
+  LLVMValueRef fn = LLVMAddFunction(Module(), name, type);
   SymbolTable.types[symbol] = type;
   SymbolTable.values[symbol] = fn;
   return fn;
@@ -28,7 +28,7 @@ LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
 LLVMValueRef call(Symbol symbol, int count, LLVMValueRef parameters[]) {
   LLVMTypeRef type = SymbolTable.types[symbol];
   LLVMValueRef fn = SymbolTable.values[symbol];
-  return LLVMBuildCall2(builder, type, fn, parameters, count, "");
+  return LLVMBuildCall2(Builder(), type, fn, parameters, count, "");
 }
 
 void DeclareGetchar() {
@@ -48,7 +48,7 @@ void EmitObjectFile(char* sourceFileName) {
   objectFileName[length + 1] = 'o';
   objectFileName[length + 2] = 0;
 
-  safe(LLVMTargetMachineEmitToFile(machine, module, objectFileName, LLVMObjectFile, &message));
+  safe(LLVMTargetMachineEmitToFile(TargetMachine(), Module(), objectFileName, LLVMObjectFile, &message));
 }
 
 /**
@@ -56,7 +56,7 @@ void EmitObjectFile(char* sourceFileName) {
  */
 LLVMValueRef CreateDataSegment() {
   LLVMTypeRef type = Int8Array(DATA_SEGMENT_SIZE);
-  LLVMValueRef ds = LLVMAddGlobal(module, type, "ds");
+  LLVMValueRef ds = LLVMAddGlobal(Module(), type, "ds");
   LLVMValueRef array[DATA_SEGMENT_SIZE];
   for (int index = 0; index < DATA_SEGMENT_SIZE; index++) {
     array[index] = Int8(0);
@@ -64,31 +64,31 @@ LLVMValueRef CreateDataSegment() {
   LLVMValueRef zeroinitializer = LLVMConstArray(LLVMInt8Type(), array, DATA_SEGMENT_SIZE);
   LLVMSetInitializer(ds, zeroinitializer);
 
-  return LLVMBuildGEP2(builder, type, ds, (LLVMValueRef[]){ Int32(0), Int32(0) }, 2, "");
+  return LLVMBuildGEP2(Builder(), type, ds, (LLVMValueRef[]){ Int32(0), Int32(0) }, 2, "");
 }
 
 /**
  * Move data pointer.
  */
 LLVMValueRef shift(LLVMValueRef dp, int offset) {
-  return LLVMBuildGEP2(builder, LLVMInt8Type(), dp, (LLVMValueRef[]){
+  return LLVMBuildGEP2(Builder(), LLVMInt8Type(), dp, (LLVMValueRef[]){
       Int32(offset)
   }, 1, "");
 }
 
 void update(LLVMValueRef dp, int offset) {
-  LLVMValueRef value = LLVMBuildLoad2(builder, LLVMInt8Type(), dp, "");
+  LLVMValueRef value = LLVMBuildLoad2(Builder(), LLVMInt8Type(), dp, "");
   if (offset > 0) {
-    value = LLVMBuildAdd(builder, value, Int8(offset), "");
+    value = LLVMBuildAdd(Builder(), value, Int8(offset), "");
   } else if (offset < 0) {
-    value = LLVMBuildSub(builder, value, Int8(-offset), "");
+    value = LLVMBuildSub(Builder(), value, Int8(-offset), "");
   }
-  LLVMBuildStore(builder, value, dp);
+  LLVMBuildStore(Builder(), value, dp);
 }
 
 void output(LLVMValueRef dp) {
-  LLVMValueRef value = LLVMBuildLoad2(builder, LLVMInt8Type(), dp, "");
-  LLVMValueRef charactor = LLVMBuildSExt(builder, value, LLVMInt32Type(), "");
+  LLVMValueRef value = LLVMBuildLoad2(Builder(), LLVMInt8Type(), dp, "");
+  LLVMValueRef charactor = LLVMBuildSExt(Builder(), value, LLVMInt32Type(), "");
   call(s_putchar, 1, (LLVMValueRef[]){ charactor });
 }
 
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 
   // main {
   LLVMValueRef main = declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  LLVMPositionBuilderAtEnd(builder, LLVMAppendBasicBlock(main, ""));
+  LLVMPositionBuilderAtEnd(Builder(), LLVMAppendBasicBlock(main, ""));
 
   update(dp, 10);
 
@@ -114,14 +114,14 @@ int main(int argc, char* argv[]) {
   LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "");
   LLVMBasicBlockRef body = LLVMAppendBasicBlock(main, "");
   LLVMBasicBlockRef end = LLVMAppendBasicBlock(main, "");
-  LLVMBuildBr(builder, entry);
+  LLVMBuildBr(Builder(), entry);
 
-  LLVMPositionBuilderAtEnd(builder, entry);
-  LLVMValueRef value = LLVMBuildLoad2(builder, LLVMInt8Type(), dp, "");
-  LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, value, Int8(0), "");
-  LLVMBuildCondBr(builder, condition, body, end);
+  LLVMPositionBuilderAtEnd(Builder(), entry);
+  LLVMValueRef value = LLVMBuildLoad2(Builder(), LLVMInt8Type(), dp, "");
+  LLVMValueRef condition = LLVMBuildICmp(Builder(), LLVMIntNE, value, Int8(0), "");
+  LLVMBuildCondBr(Builder(), condition, body, end);
 
-  LLVMPositionBuilderAtEnd(builder, body);
+  LLVMPositionBuilderAtEnd(Builder(), body);
   dp = shift(dp, 1);
   update(dp, 7);
 
@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) {
   
   dp = shift(dp, -4);
   update(dp, -1);
-  LLVMBuildBr(builder, entry);
+  LLVMBuildBr(Builder(), entry);
 
   // while }
-  LLVMPositionBuilderAtEnd(builder, end);
+  LLVMPositionBuilderAtEnd(Builder(), end);
 
   // H
   dp = shift(dp, 1);
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
   output(dp);
 
   // main }
-  LLVMBuildRet(builder, Int32(0));
+  LLVMBuildRet(Builder(), Int32(0));
 
   // output
   EmitObjectFile(argv[1]);

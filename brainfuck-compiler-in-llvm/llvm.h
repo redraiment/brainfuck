@@ -22,10 +22,10 @@
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
 #define Int8Array(n) LLVMArrayType(LLVMInt8Type(), (n))
 
-extern LLVMTargetMachineRef machine ;
-extern LLVMModuleRef module;
-extern LLVMBuilderRef builder;
-
 void LLVMSetUp(char*);
+
+LLVMTargetMachineRef TargetMachine(void);
+LLVMModuleRef Module(void);
+LLVMBuilderRef Builder(void);
 
 #endif

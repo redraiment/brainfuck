@@ -7,14 +7,29 @@
 
 #include "llvm.h"
 
-/* default machine. */
-LLVMTargetMachineRef machine = NULL;
+/* inner default machine. */
+static LLVMTargetMachineRef machine = NULL;
 
-/* default module. */
-LLVMModuleRef module = NULL;
+/* inner default module. */
+static LLVMModuleRef module = NULL;
 
-/* default builder. */
-LLVMBuilderRef builder = NULL;
+/* inner default builder. */
+static LLVMBuilderRef builder = NULL;
+
+/* Obtains the default target machine. */
+LLVMTargetMachineRef TargetMachine() {
+  return machine;
+}
+
+/* Obtains the default module. */
+LLVMModuleRef Module() {
+  return module;
+}
+
+/* Obtains the builder. */
+LLVMBuilderRef Builder() {
+  return builder;
+}
 
 /**
  * Destroy all LLVM resources.
