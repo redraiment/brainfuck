@@ -145,6 +145,13 @@ LLVMValueRef Pointer(LLVMTypeRef type, LLVMValueRef pointer, int length, LLVMVal
 }
 
 /**
+ * Build allocation.
+ */
+LLVMValueRef alloc(LLVMTypeRef type) {
+  return LLVMBuildAlloca(builder, type, "");
+}
+
+/**
  * Load value from the pointer.
  */
 LLVMValueRef load(LLVMTypeRef type, LLVMValueRef pointer) {

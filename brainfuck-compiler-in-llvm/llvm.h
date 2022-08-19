@@ -24,6 +24,7 @@ LLVMBasicBlockRef Block(LLVMValueRef);
 void enter(LLVMBasicBlockRef);
 
 LLVMValueRef Pointer(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
+LLVMValueRef alloc(LLVMTypeRef);
 LLVMValueRef load(LLVMTypeRef, LLVMValueRef);
 void store(LLVMValueRef, LLVMValueRef);
 

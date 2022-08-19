@@ -103,13 +103,29 @@ static LLVMValueRef invoke(Symbol symbol, int length, LLVMValueRef* parameters) 
 static LLVMValueRef dp = NULL;
 
 /**
- * Creates global data segment and set the data pointer.
+ * Get value of the data pointer.
  */
-static void CreateDataSegment() {
+static LLVMValueRef get() {
+  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  return load(LLVMInt8Type(), pointer);
+}
+
+/**
+ * Set value to the data pointer.
+ */
+static void set(LLVMValueRef value) {
+  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  store(pointer, value);
+}
+
+/**
+ * Create global data segment and return the data pointer.
+ */
+static LLVMValueRef CreateDataSegment() {
   LLVMTypeRef type = LLVMArrayType(LLVMInt8Type(), DATA_SEGMENT_SIZE);
   LLVMValueRef value = ConstZeroArray(LLVMInt8Type(), DATA_SEGMENT_SIZE);
   LLVMValueRef ds = DeclareGlobalVariableWithValue("ds", type, value);
-  dp = Pointer(type, ds, 2, (LLVMValueRef[]){ Int32(0), Int32(0) });
+  return Pointer(type, ds, 2, (LLVMValueRef[]){ Int32(0), Int32(0) });
 }
 
 /**
@@ -131,7 +147,7 @@ static LLVMBasicBlockRef CreateBlock() {
 void BrainfuckSetUp(void) {
   atexit(BrainfuckTearDown);
 
-  CreateDataSegment();
+  LLVMValueRef ds = CreateDataSegment();
 
   declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
   declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
@@ -139,6 +155,9 @@ void BrainfuckSetUp(void) {
   declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
 
   enter(CreateBlock());
+
+  dp = alloc(LLVMPointerType(LLVMInt8Type(), 0));
+  store(dp, ds);
 }
 
 /**
@@ -163,7 +182,7 @@ void whileEnd(void) {
 
   // entry
   enter(entry);
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
+  LLVMValueRef value = get();
   LLVMValueRef condition = compare(LLVMIntNE, value, Int8(0));
   LLVMBasicBlockRef body = CurrentBodyBlock();
   LLVMBasicBlockRef end = CreateBlock();
@@ -178,20 +197,21 @@ void whileEnd(void) {
  * Bulid command `>` and `<`: move data pointer.
  */
 void move(int step) {
-  dp = Pointer(LLVMInt8Type(), dp, 1, (LLVMValueRef[]){ Int32(step) });
+  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  store(dp, Pointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
 }
 
 /**
  * Build command `+` and `-`: apply offset to value of the data pointer.
  */
 void update(int offset) {
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
+  LLVMValueRef value = get();
   if (offset > 0) {
     value = add(value, Int8(offset));
   } else if (offset < 0) {
     value = sub(value, Int8(-offset));
   }
-  store(dp, value);
+  set(value);
 }
 
 /**
@@ -201,14 +221,14 @@ void input(void) {
   LLVMValueRef value = invoke(s_getchar, 0, (LLVMValueRef[]){});
   value = invoke(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
   value = truncate(value, LLVMInt8Type());
-  store(dp, value);
+  set(value);
 }
 
 /**
  * Build command '.'.
  */
 void output(void) {
-  LLVMValueRef value = load(LLVMInt8Type(), dp);
+  LLVMValueRef value = get();
   LLVMValueRef charactor = extend(value, LLVMInt32Type());
   invoke(s_putchar, 1, (LLVMValueRef[]){ charactor });
 }
