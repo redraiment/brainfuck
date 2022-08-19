@@ -124,6 +124,7 @@ static LLVMBasicBlockRef CreateBlock() {
  * Setup brainfuck skeleton.
  * - declare getchar.
  * - declare putchar.
+ * - declare llvm.smax.i32.
  * - declare global data segment.
  * - create data pointer.
  */
@@ -156,18 +157,21 @@ void whileNotZero(void) {
  * Build command `]`: while loop end.
  */
 void whileEnd(void) {
+  // body
   LLVMBasicBlockRef entry = CurrentEntryBlock();
   jumpTo(entry);
 
-  LLVMBasicBlockRef end = CreateBlock();
-
+  // entry
   enter(entry);
   LLVMValueRef value = load(LLVMInt8Type(), dp);
   LLVMValueRef condition = compare(LLVMIntNE, value, Int8(0));
   LLVMBasicBlockRef body = CurrentBodyBlock();
+  LLVMBasicBlockRef end = CreateBlock();
   when(condition, body, end);
 
+  // end
   enter(end);
+  pop();
 }
 
 /**
