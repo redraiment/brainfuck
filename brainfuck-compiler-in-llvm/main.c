@@ -2,36 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <llvm-c/Core.h>
-#include <llvm-c/Target.h>
-#include <llvm-c/TargetMachine.h>
-
-#define FALSE 0
-#define TRUE 1
-#define EMPTY_SPACE 0
+#include "llvm.h"
 
 #define DATA_SEGMENT_SIZE 30000
-
-/* LLVM Wrap */
-
-#define safe(expression) do {                         \
-    char* message = NULL;                             \
-    if ((expression) != FALSE) {                      \
-      fprintf(stderr, "%s\n", message);               \
-      LLVMDisposeMessage(message);                    \
-      exit(EXIT_FAILURE);                             \
-    }                                                 \
-  } while(FALSE)
-
-#define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), FALSE)
-#define Int32Array(n) LLVMArrayType(LLVMInt32Type(), (n))
-#define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), FALSE)
-#define Int8Array(n) LLVMArrayType(LLVMInt8Type(), (n))
-
-static LLVMTargetMachineRef machine = NULL;
-static LLVMTargetDataRef layout = NULL;
-static LLVMModuleRef module = NULL;
-static LLVMBuilderRef builder = NULL;
 
 typedef enum {
   s_getchar = 0,
@@ -58,63 +31,15 @@ LLVMValueRef call(Symbol symbol, int count, LLVMValueRef parameters[]) {
   return LLVMBuildCall2(builder, type, fn, parameters, count, "");
 }
 
-void LLVMInitialize(char* sourceFileName) {
-  // Initialize target machine
-  LLVMInitializeNativeTarget();
-  LLVMInitializeNativeAsmPrinter();
-  LLVMInitializeNativeAsmParser();
-
-  LLVMTargetRef target = NULL;
-  safe(LLVMGetTargetFromTriple(LLVMGetDefaultTargetTriple(), &target, &message));
-
-  machine = LLVMCreateTargetMachine(target, LLVMGetDefaultTargetTriple(), LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(), LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault);
-
-  layout = LLVMCreateTargetDataLayout(machine);
-
-  module = LLVMModuleCreateWithName(sourceFileName);
-  LLVMSetSourceFileName(module, sourceFileName, strlen(sourceFileName));
-  LLVMSetTarget(module, LLVMGetDefaultTargetTriple());
-  LLVMSetDataLayout(module, LLVMCopyStringRepOfTargetData(layout));
-
-  builder = LLVMCreateBuilder();
-}
-
-void LLVMDispose() {
-  if (builder != NULL) {
-    LLVMDisposeBuilder(builder);
-  }
-  if (module != NULL) {
-    LLVMDisposeModule(module);
-  }
-  if (layout != NULL) {
-    LLVMDisposeTargetData(layout);
-  }
-  if (machine != NULL) {
-    LLVMDisposeTargetMachine(machine);
-  }
-  LLVMShutdown();
-}
-
 void DeclareGetchar() {
-  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, FALSE));
+  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
 }
 
 void DeclarePutchar() {
-  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, FALSE));
+  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
 }
 
-void define_main(
-  LLVMModuleRef module,
-  LLVMBuilderRef builder
-) {
-  LLVMValueRef main = declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, FALSE));
-  LLVMBasicBlockRef body = LLVMAppendBasicBlock(main, "");
-  LLVMPositionBuilderAtEnd(builder, body);
-
-  LLVMBuildRet(builder, Int32(0));
-}
-
-void emit_object_file(char* sourceFileName) {
+void EmitObjectFile(char* sourceFileName) {
   char* end = strrchr(sourceFileName, '.');
   int length = end != NULL? (end - sourceFileName) : strlen(sourceFileName);
   char objectFileName[length + 2];
@@ -174,13 +99,13 @@ int main(int argc, char* argv[]) {
   }
 
   // initialize
-  LLVMInitialize(argv[1]);
+  LLVMSetUp(argv[1]);
   DeclareGetchar();
   DeclarePutchar();
   LLVMValueRef dp = CreateDataSegment();
 
   // main {
-  LLVMValueRef main = declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, FALSE));
+  LLVMValueRef main = declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
   LLVMPositionBuilderAtEnd(builder, LLVMAppendBasicBlock(main, ""));
 
   update(dp, 10);
@@ -276,9 +201,7 @@ int main(int argc, char* argv[]) {
   LLVMBuildRet(builder, Int32(0));
 
   // output
-  emit_object_file(argv[1]);
-
-  LLVMDispose();
+  EmitObjectFile(argv[1]);
 
   return 0;
 }
