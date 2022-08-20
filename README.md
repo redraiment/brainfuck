@@ -12,24 +12,25 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
 
 ## C Versions
 
-* **DONE** [ansi-c](https://github.com/redraiment/brainfuck/tree/main/ansi-c): an interpreter in pure ANSI C, without any third-party dependencies.
-* **DOING** [llvm-c](https://github.com/redraiment/brainfuck/tree/main/llvm-c): a compiler and JIT interpreter in C with flex, bison and LLVM C API etc.
+* [x] [ansi-c](https://github.com/redraiment/brainfuck/tree/main/ansi-c): an interpreter in pure ANSI C, without any third-party dependencies.
+* [ ] [llvm-c](https://github.com/redraiment/brainfuck/tree/main/llvm-c): a compiler and JIT interpreter in C with flex, bison and LLVM C API etc.
   * [ ] Generating Makefile with [GNU Automake](https://www.gnu.org/software/automake/) and [GNU Autoconf](https://www.gnu.org/software/autoconf/).
   * [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
-  * [ ] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
-    * [ ] Option for scripting mode.
-    * [ ] Option for emit LLVM IR.
-    * [ ] Option for emit object file.
-    * [ ] Option for show overview/help.
+  * [x] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
+    * [x] Option for scripting mode to execute code.
+    * [x] Option for preprocess mode to emit LLVM IR.
+    * [x] Option for compile mode to emit object file.
+    * [x] Option for show overview/help.
   * [ ] Lexical analysis with [flex](https://www.gnu.org/software/flex/).
   * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
-  * [x] Compiling with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
-  * [ ] Executing with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
+  * [ ] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+  * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+  * [ ] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
   * [ ] Deploying with [docker](https://hub.docker.com/).
 
 ## Clojure Versions
 
-* **DOING** [clojure](https://github.com/redraiment/brainfuck/tree/main/clojure): compiler and JIT interpreter in Clojure with instaparse, JNA (to wrap LLVM) etc.
+* [ ] [clojure](https://github.com/redraiment/brainfuck/tree/main/clojure): compiler and JIT interpreter in Clojure with instaparse, JNA (to wrap LLVM) etc.
   * [x] Building project with [leiningen](https://github.com/technomancy/leiningen).
   * [x] Translating Brainfuck to Clojure in compiling time with Clojure macro.
   * [ ] Lexical and Syntax analysis with [instaparse](https://github.com/Engelberg/instaparse).
