@@ -5,6 +5,9 @@
 
 #include "opts.h"
 
+/**
+ * Configurations for getopt_long.
+ */
 static struct option configs[] = {
   {"compile", no_argument, NULL, 'c'},
   {"script", no_argument, NULL, 's'},
@@ -14,16 +17,27 @@ static struct option configs[] = {
   {0, 0, 0, 0}
 };
 
+/**
+ * Static shared space for default parsed command line options.
+ */
 static struct _Options options = {
   ScriptingMode,
   NULL,
   NULL,
 };
 
+/* Max default output file name length */
 #define FILENAME_MAX_LENGTH 60
 
+/**
+ * Shared space for default object file name.
+ */
 static char defaultObjectFileName[FILENAME_MAX_LENGTH + 3] = {0};
 
+/**
+ * Create object file name: replace the source file's extension name to ".o".
+ * The name will be save into static shared space.
+ */
 static char* CreateDefaultObjectFileName(char* sourceFileName) {
   char* begin = strrchr(sourceFileName, '/');
   if (begin == NULL) {
@@ -107,14 +121,15 @@ Options CommandLineOptions(int argc, char* argv[]) {
     }
   }
 
+  // Only accept one source file.
   if (optind + 1 == argc) {
     options.source = argv[optind];
   } else {
     help();
   }
 
+  // Only Compile mode need a default output name.
   if (options.output == NULL && options.mode == CompileMode) {
-    // Use default output name
     options.output = CreateDefaultObjectFileName(options.source);
   }
 
