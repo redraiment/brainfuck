@@ -1,22 +1,47 @@
-# brainfuck
+# Brainfuck Interpreters and Compilers
 
-Here are toy interpreters and compilers of [brainfuck](https://en.wikipedia.org/wiki/Brainfuck) language.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-## Projects
+This is my learning project to practice building compilers. I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) interpreters and compilers in my favorite programming languages (only Clojure and C for now, and perhaps Haskell in the future). Brainfuck language is simple enough, and it designed for implementing the smallest possible compiler.
 
-* **DONE** [brainfuck-interpreter-in-clojure-macro](https://github.com/redraiment/brainfuck/tree/main/brainfuck-interpreter-in-clojure-macro): it's a clojure macro to translate brainfuck codes to clojure codes in compile time.
-* **DONE** [brainfuck-interpreter-in-ansi-c](https://github.com/redraiment/brainfuck/tree/main/brainfuck-interpreter-in-ansi-c): it's an interpreter in pure ANSI C without any third party library dependency.
-* **DOING** brainfuck-interpreter-in-llvm-jit: an interpreter with LLVM JIT in C.
-* **DOING** brainfuck-compiler-in-llvm: a compiler can generate executable file with flex, bison and LLVM in C.
-* samples: some brainfuck samples.
+# Plan
 
-## Language Specification
+## C Versions
 
-Information from Wikipedia above.
+* **DONE** [ansi-c](https://github.com/redraiment/brainfuck/tree/main/ansi-c): an interpreter in pure ANSI C, without any third-party dependencies.
+* **DOING** [llvm-c](https://github.com/redraiment/brainfuck/tree/main/llvm-c): a compiler and JIT interpreter in C with flex, bison and LLVM C API etc.
+  * [ ] Generating Makefile with [GNU Automake](https://www.gnu.org/software/automake/) and [GNU Autoconf](https://www.gnu.org/software/autoconf/).
+  * [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
+  * [ ] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
+    * [ ] Option for scripting mode.
+    * [ ] Option for emit LLVM IR.
+    * [ ] Option for emit object file.
+    * [ ] Option for show overview/help.
+  * [ ] Lexical analysis with [flex](https://www.gnu.org/software/flex/).
+  * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
+  * [x] Compiling with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+  * [ ] Executing with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
+  * [ ] Deploying with [docker](https://hub.docker.com/).
+
+## Clojure Versions
+
+* **DOING** [clojure](https://github.com/redraiment/brainfuck/tree/main/clojure): compiler and JIT interpreter in Clojure with instaparse, JNA (to wrap LLVM) etc.
+  * [x] Building project with [leiningen](https://github.com/technomancy/leiningen).
+  * [x] Translating Brainfuck to Clojure in compiling time with Clojure macro.
+  * [ ] Lexical and Syntax analysis with [instaparse](https://github.com/Engelberg/instaparse).
+  * [ ] Executing with pure Clojure.
+  * [ ] Wrap LLVM with [JNA](https://github.com/java-native-access/jna).
+  * [ ] Executing with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
+  * [ ] Deploying with [docker](https://hub.docker.com/).
+
+# Language Specification
+
+Here some key informations from [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck).
 
 * Memory size: 30,000 bytes, and initialized to zero.
 * Data pointer initialized to point to the leftmost byte of the array.
 * Two streams of bytes for input and output.
+* End-of-file behavior: setting the cell to 0.
 * Eight commands:
 
 | Character | Meaning |
@@ -30,4 +55,42 @@ Information from Wikipedia above.
 | `[` | If the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching `]` command. |
 | `]` | If the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching `[` command. |
 
-* End-of-file behavior: setting the cell to 0.
+## Examples
+
+Here some Brainfuck examples for testing.
+
+### Hello World
+
+From [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!). It will write "Hello world" to standard output.
+
+```brainfuck
+++++++++++
+[>+++++++>++++++++++>+++>+<<<<-]
+>++.>+.+++++++..+++.>++.<<+++++++++++++++.
+>.+++.------.--------.>+.>.
+```
+
+### cat
+
+It will read data from standard input and write to standard output directly, until end of file.
+
+```brainfuck
+,[.,]
+```
+
+### wc
+
+from [brainfuck.org](http://brainfuck.org/wc.b). the standard (line and) word (and character) count utility.
+
+```brainfuck
+>>>+>>>>>+>>+>>+[<<],[
+    -[-[-[-[-[-[-[-[<+>-[>+<-[>-<-[-[-[<++[<++++++>-]<
+        [>>[-<]<[>]<-]>>[<+>-[<->[-]]]]]]]]]]]]]]]]
+    <[-<<[-]+>]<<[>>>>>>+<<<<<<-]>[>]>>>>>>>+>[
+        <+[
+            >+++++++++<-[>-<-]++>[<+++++++>-[<->-]+[+>>>>>>]]
+            <[>+<-]>[>>>>>++>[-]]+<
+        ]>[-<<<<<<]>>>>
+    ],
+]+<++>>>[[+++++>>>>>>]<+>+[[<++++++++>-]<.<<<<<]>>>>>>>>]
+```
