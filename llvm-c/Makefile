@@ -1,5 +1,5 @@
 PROGRAM := brainfuck
-OBJECTS := main.o options.o engine.o compiler.o
+OBJECTS := main.o options.o engine.o compiler.o linker.o
 
 CC := clang
 CFLAGS := $(shell llvm-config --cflags)

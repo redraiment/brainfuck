@@ -4,6 +4,7 @@
 #include "options.h"
 #include "engine.h"
 #include "compiler.h"
+#include "linker.h"
 
 int main(int argc, char* argv[]) {
   SetUpCompiler();
@@ -16,6 +17,10 @@ int main(int argc, char* argv[]) {
     break;
   case CompileMode:
     EmitObjectFile(options->output);
+    break;
+  case LinkMode:
+    EmitObjectFile(options->object);
+    Link(options->object, options->output);
     break;
   case ScriptingMode:
     ExecuteMachineCode();

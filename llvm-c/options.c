@@ -9,9 +9,10 @@
  * Configurations for getopt_long.
  */
 static struct option configs[] = {
-  {"compile", no_argument, NULL, 'c'},
-  {"script", no_argument, NULL, 's'},
   {"preprocess", no_argument, NULL, 'p'},
+  {"compile", no_argument, NULL, 'c'},
+  {"link", no_argument, NULL, 'l'},
+  {"script", no_argument, NULL, 's'},
   {"output", required_argument, NULL, 'o'},
   {"help", no_argument, NULL, 'h'},
   {0, 0, 0, 0}
@@ -24,41 +25,43 @@ static struct _Options options = {
   ScriptingMode,
   NULL,
   NULL,
+  NULL,
 };
 
-/* Max default output file name length */
-#define FILENAME_MAX_LENGTH 60
+/**
+ * Free file name spaces.
+ */
+static void TearDownOptions(void) {
+  if (options.object != NULL) {
+    free(options.object);
+    options.object = NULL;
+  }
+  if (options.output != NULL) {
+    free(options.output);
+    options.output = NULL;
+  }
+}
 
 /**
- * Shared space for default object file name.
+ * Create file name: strip the source file's extension and append with suffix.
  */
-static char defaultObjectFileName[FILENAME_MAX_LENGTH + 3] = {0};
-
-/**
- * Create object file name: replace the source file's extension name to ".o".
- * The name will be save into static shared space.
- */
-static char* CreateDefaultObjectFileName(char* sourceFileName) {
-  char* begin = strrchr(sourceFileName, '/');
+static char* CopyFileName(char* source, char* suffix) {
+  char* begin = strrchr(source, '/');
   if (begin == NULL) {
-    begin = sourceFileName;
+    begin = source;
   }
   char* end = strrchr(begin, '.');
   if (end == NULL) {
     end = begin + strlen(begin);
   }
 
-  int length = end - begin;
-  if (length > FILENAME_MAX_LENGTH) {
-    length = FILENAME_MAX_LENGTH;
-  }
+  int prefixLength = end - begin;
+  int suffixLength = strlen(suffix);
+  char* target = (char*)calloc(sizeof(char), prefixLength + suffixLength + 1);
+  strncpy(target, begin, prefixLength);
+  strncpy(target + prefixLength, suffix, suffixLength);
 
-  strncpy(defaultObjectFileName, begin, length);
-  defaultObjectFileName[length++] = '.';
-  defaultObjectFileName[length++] = 'o';
-  defaultObjectFileName[length++] = 0;
-
-  return defaultObjectFileName;
+  return target;
 }
 
 /**
@@ -73,6 +76,9 @@ static void Help(void) {
 
   fprintf(stderr, "  -c/--compile\n");
   fprintf(stderr, "    Enable compile mode. Emit native object (.o).\n\n");
+
+  fprintf(stderr, "  -l/--link\n");
+  fprintf(stderr, "    Enable link mode. Emit executable file.\n\n");
 
   fprintf(stderr, "  -p/--preprocess\n");
   fprintf(stderr, "    Enable preprocess mode. Emit LLVM representation (.ll).\n\n");
@@ -97,17 +103,20 @@ static void Help(void) {
 Options ParseCommandLineArguments(int argc, char* argv[]) {
   while (1) {
     int index = 0;
-    int charactor = getopt_long(argc, argv, "hcpso:", configs, &index);
+    int charactor = getopt_long(argc, argv, "hpclso:", configs, &index);
     if (charactor < 0) {
       break;
     }
 
     switch (charactor) {
+    case 'p':
+      options.mode = PreprocessMode;
+      break;
     case 'c':
       options.mode = CompileMode;
       break;
-    case 'p':
-      options.mode = PreprocessMode;
+    case 'l':
+      options.mode = LinkMode;
       break;
     case 's':
       options.mode = ScriptingMode;
@@ -128,9 +137,16 @@ Options ParseCommandLineArguments(int argc, char* argv[]) {
     Help();
   }
 
-  // Only Compile mode need a default output name.
-  if (options.output == NULL && options.mode == CompileMode) {
-    options.output = CreateDefaultObjectFileName(options.source);
+  options.object = CopyFileName(options.source, ".o");
+  if (options.output == NULL) {
+    if (options.mode == CompileMode) {
+      options.output = CopyFileName(options.source, ".o");
+    } else if (options.mode == LinkMode) {
+      options.output = CopyFileName(options.source, "");
+    }
+  } else {
+    // Clone a copy
+    options.output = CopyFileName(options.output, "");
   }
 
   return &options;

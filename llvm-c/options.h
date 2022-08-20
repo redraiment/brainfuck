@@ -7,10 +7,12 @@
 typedef enum {
   /* Parse & execute */
   ScriptingMode = 0,
+  /* Emit LLVM representation */
+  PreprocessMode,
   /* Emit native object */
   CompileMode,
-  /* Emit LLVM representation */
-  PreprocessMode
+  /* Emit executable file */
+  LinkMode
 } Mode;
 
 /**
@@ -22,6 +24,10 @@ typedef struct _Options {
    * Source filename.
    */
   char* source;
+  /**
+   * Object filename.
+   */
+  char* object;
   /**
    * Output filename.
    */
