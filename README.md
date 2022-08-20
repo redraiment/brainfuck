@@ -2,9 +2,13 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This is my learning project to practice building compilers. I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) interpreters and compilers in my favorite programming languages (only Clojure and C for now, and perhaps Haskell in the future). Brainfuck language is simple enough, and it designed for implementing the smallest possible compiler.
+This is my learning project to practice building compilers.
 
-# Plan
+# About the Project
+
+I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) interpreters and compilers in my favorite programming languages (only Clojure and C for now, and perhaps Haskell in the future). Brainfuck language is simple enough, and it designed for implementing the smallest possible compiler.
+
+# Roadmap
 
 ## C Versions
 
@@ -36,13 +40,14 @@ This is my learning project to practice building compilers. I'd like to implemen
 
 # Language Specification
 
-Here some key informations from [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck).
+Here are some key behaviors:
 
 * Memory size: 30,000 bytes, and initialized to zero.
 * Data pointer initialized to point to the leftmost byte of the array.
 * Two streams of bytes for input and output.
 * End-of-file behavior: setting the cell to 0.
-* Eight commands:
+* Use "\n" for end-of-line.
+* Commands:
 
 | Character | Meaning |
 | -- | -- |
@@ -54,6 +59,19 @@ Here some key informations from [Wikipedia](https://en.wikipedia.org/wiki/Brainf
 | `,` | Accept one byte of input, storing its value in the byte at the data pointer. |
 | `[` | If the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching `]` command. |
 | `]` | If the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching `[` command. |
+| others | Comments |
+
+# Getting Started
+
+**TODO**
+
+## Prerequisites
+
+## Installation
+
+# Usage
+
+**TODO**
 
 ## Examples
 
@@ -94,3 +112,35 @@ from [brainfuck.org](http://brainfuck.org/wc.b). the standard (line and) word (a
     ],
 ]+<++>>>[[+++++>>>>>>]<+>+[[<++++++++>-]<.<<<<<]>>>>>>>>]
 ```
+
+# Contributing
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+1. Create your Feature Branch (git checkout -b feature/AmazingFeature)
+1. Commit your Changes (git commit -m 'Add some AmazingFeature')
+1. Push to the Branch (git push origin feature/AmazingFeature)
+1. Open a Pull Request
+
+# License
+
+Distrubuted under the GPLv3 License. See `LICENSE` for more information.
+
+# Contact
+
+* Zhang, Zepeng - [@redraiment](https://twitter.com/redraiment) - [redraiment@gmail.com](mailto:redraiment@gmail.com)
+
+# Acknowledgments
+
+* [Wikipedia](https://en.wikipedia.org/)
+* [brainfuck.org](http://brainfuck.org/)
+* [LLVM.org](https://llvm.org/)
+* [GNU](https://www.gnu.org/)
+  * [GNU Automake](https://www.gnu.org/software/automake/)
+  * [GNU Autoconf](https://www.gnu.org/software/autoconf/)
+  * [GNU Make](https://www.gnu.org/software/make/)
+  * [GNU getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html)
+  * [GNU flex](https://www.gnu.org/software/flex/).
+  * [GNU bison](https://www.gnu.org/software/bison/).
+* [Docker](https://www.docker.com/).
