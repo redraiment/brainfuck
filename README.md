@@ -23,7 +23,7 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
     * [x] Option for show overview/help.
   * [ ] Lexical analysis with [flex](https://www.gnu.org/software/flex/).
   * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
-  * [ ] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+  * [x] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [ ] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
   * [ ] Deploying with [docker](https://hub.docker.com/).
