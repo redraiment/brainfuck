@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include "llvm.h"
-#include "lang.h"
+#include "compiler.h"
 
 /**
  * Stack segment for loop.

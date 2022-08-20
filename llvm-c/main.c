@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "opts.h"
+#include "options.h"
 #include "llvm.h"
-#include "lang.h"
+#include "compiler.h"
 
 int main(int argc, char* argv[]) {
   Options options = CommandLineOptions(argc, argv);

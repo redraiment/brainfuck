@@ -1,5 +1,5 @@
-#ifndef __OPTS_H_
-#define __OPTS_H_
+#ifndef __OPTIONS_H_
+#define __OPTIONS_H_
 
 /**
  * Executing mode.

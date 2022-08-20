@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <getopt.h>
 
-#include "opts.h"
+#include "options.h"
 
 /**
  * Configurations for getopt_long.

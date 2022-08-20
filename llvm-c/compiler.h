@@ -1,5 +1,5 @@
-#ifndef __LANG_H_
-#define __LANG_H_
+#ifndef __COMPILER_H_
+#define __COMPILER_H_
 
 #define DATA_SEGMENT_SIZE 30000
 
