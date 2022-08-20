@@ -1,25 +1,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "opts.h"
 #include "llvm.h"
 #include "lang.h"
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    fprintf(stderr, "Usage: %s <source-file> <object-file>\n", argv[0]);
-    exit(EXIT_FAILURE);
-  }
-
-  char* source = argv[1]; /* source filename */
-  char* object = argv[2]; /* object filename */
+  Options options = CommandLineOptions(argc, argv);
 
   // initialize
-  LLVMSetUp(source);
+  LLVMSetUp(options->source);
   BrainfuckSetUp();
 
-  FILE* fin = fopen(source, "r");
+  FILE* fin = fopen(options->source, "r");
   if (fin == NULL) {
-    fprintf(stderr, "Open source file %s failed!\n", source);
+    fprintf(stderr, "Open source file %s failed!\n", options->source);
     exit(EXIT_FAILURE);
   }
 
@@ -62,7 +57,7 @@ int main(int argc, char* argv[]) {
   returnWith(Int32(0));
 
   // output
-  EmitObjectFile(object);
+  EmitObjectFile(options->output);
 
   return 0;
 }
