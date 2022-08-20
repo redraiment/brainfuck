@@ -40,6 +40,7 @@ void returnVoid();
 LLVMValueRef extend(LLVMValueRef, LLVMTypeRef);
 LLVMValueRef truncate(LLVMValueRef, LLVMTypeRef);
 
+void EmitIntermediateRepresentation(char*);
 void EmitObjectFile(char*);
 
 #endif

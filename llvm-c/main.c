@@ -57,7 +57,15 @@ int main(int argc, char* argv[]) {
   returnWith(Int32(0));
 
   // output
-  EmitObjectFile(options->output);
+  switch (options->mode) {
+  case PreprocessMode:
+    EmitIntermediateRepresentation(options->output);
+    break;
+  case CompileMode:
+    EmitObjectFile(options->output);
+  case ScriptingMode:
+    break;
+  }
 
   return 0;
 }

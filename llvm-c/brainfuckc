@@ -11,6 +11,6 @@ source_filename=$1
 object_filename=$(mktemp --dry-run -q --suffix '.o')
 target_filename=$2
 
-$compiler "$source_filename" "$object_filename"
+$compiler -c "$source_filename" -o "$object_filename"
 clang "$object_filename" -o "$target_filename"
 rm -f "$object_filename"

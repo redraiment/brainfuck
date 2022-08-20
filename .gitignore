@@ -1,3 +1,7 @@
+# For Brainfuck Testing Files
+
+*.bf
+
 # For Clojure Project
 
 target/

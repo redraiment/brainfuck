@@ -234,7 +234,25 @@ LLVMValueRef truncate(LLVMValueRef value, LLVMTypeRef type) {
   return LLVMBuildTrunc(builder, value, type, "");
 }
 
-/* Object File */
+/* Output */
+
+/**
+ * Emit LLVM IR for the module to file or standard output if filename is NULL.
+ */
+void EmitIntermediateRepresentation(char* filename) {
+  char* ir = LLVMPrintModuleToString(module);
+  if (filename == NULL) {
+    printf("%s", ir);
+  } else {
+    FILE* fout = fopen(filename, "w");
+    if (fout == NULL) {
+      fprintf(stderr, "Open output file %s failed!\n", filename);
+      exit(EXIT_FAILURE);
+    }
+    fprintf(fout, "%s", ir);
+    fclose(fout);
+  }
+}
 
 /**
  * Emit object file for the module to given filename.
