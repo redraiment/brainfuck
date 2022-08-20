@@ -11,35 +11,35 @@
 #define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), False)
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
 
-void EngineSetUp();
+void SetUpEngine();
 void SetDefaultModule(char*);
 
 LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
 LLVMValueRef DeclareGlobalVariableWithValue(char*, LLVMTypeRef, LLVMValueRef);
 LLVMValueRef DeclareFunction(char*, LLVMTypeRef);
 
-LLVMValueRef ConstZeroArray(LLVMTypeRef, int);
+LLVMValueRef CreateZeroInitializer(LLVMTypeRef, int);
 
-LLVMValueRef call(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
-LLVMBasicBlockRef Block(LLVMValueRef);
-void enter(LLVMBasicBlockRef);
+LLVMValueRef CallFunction(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
+LLVMBasicBlockRef CreateAndAppendBlock(LLVMValueRef);
+void EnterBlock(LLVMBasicBlockRef);
 
-LLVMValueRef Pointer(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
-LLVMValueRef alloc(LLVMTypeRef);
-LLVMValueRef load(LLVMTypeRef, LLVMValueRef);
-void store(LLVMValueRef, LLVMValueRef);
+LLVMValueRef GetPointer(LLVMTypeRef, LLVMValueRef, int, LLVMValueRef*);
+LLVMValueRef Alloc(LLVMTypeRef);
+LLVMValueRef Load(LLVMTypeRef, LLVMValueRef);
+void Store(LLVMValueRef, LLVMValueRef);
 
-LLVMValueRef add(LLVMValueRef, LLVMValueRef);
-LLVMValueRef sub(LLVMValueRef, LLVMValueRef);
-LLVMValueRef compare(LLVMIntPredicate, LLVMValueRef, LLVMValueRef);
+LLVMValueRef Add(LLVMValueRef, LLVMValueRef);
+LLVMValueRef Sub(LLVMValueRef, LLVMValueRef);
+LLVMValueRef Compare(LLVMIntPredicate, LLVMValueRef, LLVMValueRef);
 
-void when(LLVMValueRef, LLVMBasicBlockRef, LLVMBasicBlockRef);
-void jumpTo(LLVMBasicBlockRef);
-void returnWith(LLVMValueRef);
-void returnVoid();
+void If(LLVMValueRef, LLVMBasicBlockRef, LLVMBasicBlockRef);
+void Goto(LLVMBasicBlockRef);
+void Return(LLVMValueRef);
+void ReturnVoid();
 
-LLVMValueRef extend(LLVMValueRef, LLVMTypeRef);
-LLVMValueRef truncate(LLVMValueRef, LLVMTypeRef);
+LLVMValueRef ExtendType(LLVMValueRef, LLVMTypeRef);
+LLVMValueRef TruncateType(LLVMValueRef, LLVMTypeRef);
 
 void EmitIntermediateRepresentation(char*);
 void EmitObjectFile(char*);

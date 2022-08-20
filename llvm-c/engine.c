@@ -19,7 +19,7 @@ static LLVMBuilderRef builder = NULL;
 /**
  * Destroy all LLVM resources.
  */
-static void EngineTearDown(void) {
+static void TearDownEngine(void) {
   if (builder != NULL) {
     LLVMDisposeBuilder(builder);
   }
@@ -35,8 +35,8 @@ static void EngineTearDown(void) {
 /**
  * Initialize LLVM target machine.
  */
-void EngineSetUp() {
-  atexit(EngineTearDown);
+void SetUpEngine() {
+  atexit(TearDownEngine);
 
   LLVMInitializeNativeTarget();
   LLVMInitializeNativeAsmPrinter();
@@ -103,7 +103,7 @@ LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
 /**
  * Create an integer array with given type and length, and initialized to zero.
  */
-LLVMValueRef ConstZeroArray(LLVMTypeRef elementType, int length) {
+LLVMValueRef CreateZeroInitializer(LLVMTypeRef elementType, int length) {
   LLVMTypeRef type = LLVMArrayType(elementType, length);
   LLVMValueRef zero = LLVMConstInt(elementType, 0, False);
   LLVMValueRef values[length];
@@ -118,21 +118,21 @@ LLVMValueRef ConstZeroArray(LLVMTypeRef elementType, int length) {
 /**
  * Build call function.
  */
-LLVMValueRef call(LLVMTypeRef type, LLVMValueRef fn, int length, LLVMValueRef* parameters) {
+LLVMValueRef CallFunction(LLVMTypeRef type, LLVMValueRef fn, int length, LLVMValueRef* parameters) {
   return LLVMBuildCall2(builder, type, fn, parameters, length, "");
 }
 
 /**
  * Append a basic block to given function.
  */
-LLVMBasicBlockRef Block(LLVMValueRef fn) {
+LLVMBasicBlockRef CreateAndAppendBlock(LLVMValueRef fn) {
   return LLVMAppendBasicBlock(fn, "");
 }
 
 /**
  * Move builder position to end of given block.
  */
-void enter(LLVMBasicBlockRef block) {
+void EnterBlock(LLVMBasicBlockRef block) {
   LLVMPositionBuilderAtEnd(builder, block);
 }
 
@@ -141,28 +141,28 @@ void enter(LLVMBasicBlockRef block) {
 /**
  * Build get element pointer.
  */
-LLVMValueRef Pointer(LLVMTypeRef type, LLVMValueRef pointer, int length, LLVMValueRef* offset) {
+LLVMValueRef GetPointer(LLVMTypeRef type, LLVMValueRef pointer, int length, LLVMValueRef* offset) {
   return LLVMBuildGEP2(builder, type, pointer, offset, length, "");
 }
 
 /**
  * Build allocation.
  */
-LLVMValueRef alloc(LLVMTypeRef type) {
+LLVMValueRef Alloc(LLVMTypeRef type) {
   return LLVMBuildAlloca(builder, type, "");
 }
 
 /**
  * Load value from the pointer.
  */
-LLVMValueRef load(LLVMTypeRef type, LLVMValueRef pointer) {
+LLVMValueRef Load(LLVMTypeRef type, LLVMValueRef pointer) {
   return LLVMBuildLoad2(builder, type, pointer, "");
 }
 
 /**
  * Save value to the pointer.
  */
-void store(LLVMValueRef pointer, LLVMValueRef value) {
+void Store(LLVMValueRef pointer, LLVMValueRef value) {
   LLVMBuildStore(builder, value, pointer);
 }
 
@@ -171,21 +171,21 @@ void store(LLVMValueRef pointer, LLVMValueRef value) {
 /**
  * Build plus.
  */
-LLVMValueRef add(LLVMValueRef left, LLVMValueRef right) {
+LLVMValueRef Add(LLVMValueRef left, LLVMValueRef right) {
   return LLVMBuildAdd(builder, left, right, "");
 }
 
 /**
  * Build minus.
  */
-LLVMValueRef sub(LLVMValueRef left, LLVMValueRef right) {
+LLVMValueRef Sub(LLVMValueRef left, LLVMValueRef right) {
   return LLVMBuildSub(builder, left, right, "");
 }
 
 /**
  * Build compare.
  */
-LLVMValueRef compare(LLVMIntPredicate predicate, LLVMValueRef left, LLVMValueRef right) {
+LLVMValueRef Compare(LLVMIntPredicate predicate, LLVMValueRef left, LLVMValueRef right) {
   return LLVMBuildICmp(builder, predicate, left, right, "");
 }
 
@@ -194,28 +194,28 @@ LLVMValueRef compare(LLVMIntPredicate predicate, LLVMValueRef left, LLVMValueRef
 /**
  * Build condition branch.
  */
-void when(LLVMValueRef condition, LLVMBasicBlockRef then, LLVMBasicBlockRef otherwise) {
+void If(LLVMValueRef condition, LLVMBasicBlockRef then, LLVMBasicBlockRef otherwise) {
   LLVMBuildCondBr(builder, condition, then, otherwise);
 }
 
 /**
  * Build branch.
  */
-void jumpTo(LLVMBasicBlockRef label) {
+void Goto(LLVMBasicBlockRef label) {
   LLVMBuildBr(builder, label);
 }
 
 /**
  * Build return a value.
  */
-void returnWith(LLVMValueRef value) {
+void Return(LLVMValueRef value) {
   LLVMBuildRet(builder, value);
 }
 
 /**
  * Build return void.
  */
-void returnVoid() {
+void ReturnVoid() {
   LLVMBuildRetVoid(builder);
 }
 
@@ -224,14 +224,14 @@ void returnVoid() {
 /**
  * Sign extends type.
  */
-LLVMValueRef extend(LLVMValueRef value, LLVMTypeRef type) {
+LLVMValueRef ExtendType(LLVMValueRef value, LLVMTypeRef type) {
   return LLVMBuildSExt(builder, value, type, "");
 }
 
 /**
  * Truncate type.
  */
-LLVMValueRef truncate(LLVMValueRef value, LLVMTypeRef type) {
+LLVMValueRef TruncateType(LLVMValueRef value, LLVMTypeRef type) {
   return LLVMBuildTrunc(builder, value, type, "");
 }
 

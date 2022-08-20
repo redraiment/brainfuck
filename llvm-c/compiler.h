@@ -3,7 +3,7 @@
 
 #define DATA_SEGMENT_SIZE 30000
 
-void CompilerSetUp(void);
+void SetUpCompiler(void);
 void Compile(char*);
 
 #endif

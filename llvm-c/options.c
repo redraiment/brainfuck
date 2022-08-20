@@ -64,7 +64,7 @@ static char* CreateDefaultObjectFileName(char* sourceFileName) {
 /**
  * Show help and exit.
  */
-static void help(void) {
+static void Help(void) {
   fprintf(stderr, "Overview: brainfuck interpreter and compiler.\n\n");
 
   fprintf(stderr, "Usage: brainfuck [OPTIONS] <source-file>\n\n");
@@ -94,7 +94,7 @@ static void help(void) {
 /**
  * Parse command line arguments with getopt_long and return parsed options.
  */
-Options CommandLineOptions(int argc, char* argv[]) {
+Options ParseCommandLineArguments(int argc, char* argv[]) {
   while (1) {
     int index = 0;
     int charactor = getopt_long(argc, argv, "hcpso:", configs, &index);
@@ -116,7 +116,7 @@ Options CommandLineOptions(int argc, char* argv[]) {
       options.output = optarg;
       break;
     default:
-      help();
+      Help();
       break;
     }
   }
@@ -125,7 +125,7 @@ Options CommandLineOptions(int argc, char* argv[]) {
   if (optind + 1 == argc) {
     options.source = argv[optind];
   } else {
-    help();
+    Help();
   }
 
   // Only Compile mode need a default output name.

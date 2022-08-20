@@ -34,7 +34,7 @@ static LLVMBasicBlockRef CurrentBodyBlock() {
 /**
  * Push the block to top.
  */
-static void push(LLVMBasicBlockRef entry, LLVMBasicBlockRef body) {
+static void StackPush(LLVMBasicBlockRef entry, LLVMBasicBlockRef body) {
   Stack top = (Stack)calloc(sizeof(struct _Stack), 1);
   top->entry = entry;
   top->body = body;
@@ -45,7 +45,7 @@ static void push(LLVMBasicBlockRef entry, LLVMBasicBlockRef body) {
 /**
  * Pop the top block.
  */
-static void pop() {
+static void StackPop() {
   if (stack != NULL) {
     Stack top = stack;
     stack = stack->next;
@@ -75,7 +75,7 @@ static struct {
 /**
  * Import function.
  */
-static LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
+static LLVMValueRef DefineFunction(Symbol symbol, char* name, LLVMTypeRef type) {
   SymbolTable.types[symbol] = type;
   SymbolTable.values[symbol] = DeclareFunction(name, type);
   return SymbolTable.values[symbol];
@@ -84,10 +84,10 @@ static LLVMValueRef declare(Symbol symbol, char* name, LLVMTypeRef type) {
 /**
  * Call imported function.
  */
-static LLVMValueRef invoke(Symbol symbol, int length, LLVMValueRef* parameters) {
+static LLVMValueRef InvokeFunction(Symbol symbol, int length, LLVMValueRef* parameters) {
   LLVMTypeRef type = SymbolTable.types[symbol];
   LLVMValueRef fn = SymbolTable.values[symbol];
-  return call(type, fn, length, parameters);
+  return CallFunction(type, fn, length, parameters);
 }
 
 /* Data Pointer */
@@ -96,35 +96,35 @@ static LLVMValueRef dp = NULL;
 /**
  * Get value of the data pointer.
  */
-static LLVMValueRef get() {
-  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
-  return load(LLVMInt8Type(), pointer);
+static LLVMValueRef GetValue() {
+  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  return Load(LLVMInt8Type(), pointer);
 }
 
 /**
  * Set value to the data pointer.
  */
-static void set(LLVMValueRef value) {
-  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
-  store(pointer, value);
+static void SetValue(LLVMValueRef value) {
+  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  Store(pointer, value);
 }
 
 /**
  * Create global data segment and return the data pointer.
  */
-static LLVMValueRef CreateDataSegment() {
+static LLVMValueRef DefineDataSegment() {
   LLVMTypeRef type = LLVMArrayType(LLVMInt8Type(), DATA_SEGMENT_SIZE);
-  LLVMValueRef value = ConstZeroArray(LLVMInt8Type(), DATA_SEGMENT_SIZE);
-  LLVMValueRef ds = DeclareGlobalVariableWithValue("ds", type, value);
-  return Pointer(type, ds, 2, (LLVMValueRef[]){ Int32(0), Int32(0) });
+  LLVMValueRef initializer = CreateZeroInitializer(LLVMInt8Type(), DATA_SEGMENT_SIZE);
+  LLVMValueRef ds = DeclareGlobalVariableWithValue("ds", type, initializer);
+  return GetPointer(type, ds, 2, (LLVMValueRef[]){ Int32(0), Int32(0) });
 }
 
 /**
  * Create basic block and append to main function.
  */
-static LLVMBasicBlockRef CreateBlock() {
+static LLVMBasicBlockRef NewBlock() {
   LLVMValueRef fn = SymbolTable.values[s_main];
-  return Block(fn);
+  return CreateAndAppendBlock(fn);
 }
 
 /* Eight Commands */
@@ -132,74 +132,74 @@ static LLVMBasicBlockRef CreateBlock() {
 /**
  * Build command `[`: while loop begin.
  */
-static void whileNotZero(void) {
-  LLVMBasicBlockRef entry = CreateBlock();
-  jumpTo(entry);
+static void WhileNotZero(void) {
+  LLVMBasicBlockRef entry = NewBlock();
+  Goto(entry);
 
-  LLVMBasicBlockRef body = CreateBlock();
-  push(entry, body);
-  enter(body);
+  LLVMBasicBlockRef body = NewBlock();
+  StackPush(entry, body);
+  EnterBlock(body);
 }
 
 /**
  * Build command `]`: while loop end.
  */
-static void whileEnd(void) {
+static void WhileEnd(void) {
   // body
   LLVMBasicBlockRef entry = CurrentEntryBlock();
-  jumpTo(entry);
+  Goto(entry);
 
   // entry
-  enter(entry);
-  LLVMValueRef value = get();
-  LLVMValueRef condition = compare(LLVMIntNE, value, Int8(0));
+  EnterBlock(entry);
+  LLVMValueRef value = GetValue();
+  LLVMValueRef condition = Compare(LLVMIntNE, value, Int8(0));
   LLVMBasicBlockRef body = CurrentBodyBlock();
-  LLVMBasicBlockRef end = CreateBlock();
-  when(condition, body, end);
+  LLVMBasicBlockRef end = NewBlock();
+  If(condition, body, end);
 
   // end
-  enter(end);
-  pop();
+  EnterBlock(end);
+  StackPop();
 }
 
 /**
  * Bulid command `>` and `<`: move data pointer.
  */
-static void move(int step) {
-  LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
-  store(dp, Pointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
+static void MovePointer(int step) {
+  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  Store(dp, GetPointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
 }
 
 /**
  * Build command `+` and `-`: apply offset to value of the data pointer.
  */
-static void update(int offset) {
-  LLVMValueRef value = get();
+static void UpdateValue(int offset) {
+  LLVMValueRef value = GetValue();
   if (offset > 0) {
-    value = add(value, Int8(offset));
+    value = Add(value, Int8(offset));
   } else if (offset < 0) {
-    value = sub(value, Int8(-offset));
+    value = Sub(value, Int8(-offset));
   }
-  set(value);
+  SetValue(value);
 }
 
 /**
  * Build command ','.
  */
-static void input(void) {
-  LLVMValueRef value = invoke(s_getchar, 0, (LLVMValueRef[]){});
-  value = invoke(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
-  value = truncate(value, LLVMInt8Type());
-  set(value);
+static void InputValue(void) {
+  LLVMValueRef value = InvokeFunction(s_getchar, 0, (LLVMValueRef[]){});
+  value = InvokeFunction(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
+  value = TruncateType(value, LLVMInt8Type());
+  SetValue(value);
 }
 
 /**
  * Build command '.'.
  */
-static void output(void) {
-  LLVMValueRef value = get();
-  LLVMValueRef charactor = extend(value, LLVMInt32Type());
-  invoke(s_putchar, 1, (LLVMValueRef[]){ charactor });
+static void OutputValue(void) {
+  LLVMValueRef value = GetValue();
+  LLVMValueRef charactor = ExtendType(value, LLVMInt32Type());
+  InvokeFunction(s_putchar, 1, (LLVMValueRef[]){ charactor });
 }
 
 /* Compiler */
@@ -207,9 +207,9 @@ static void output(void) {
 /**
  * Remove all blocks.
  */
-static void CompilerTearDown(void) {
+static void TearDownCompiler(void) {
   while (stack != NULL) {
-    pop();
+    StackPop();
   }
 }
 
@@ -221,10 +221,9 @@ static void CompilerTearDown(void) {
  * - declare global data segment.
  * - create data pointer.
  */
-void CompilerSetUp(void) {
-  atexit(CompilerTearDown);
-
-  EngineSetUp();
+void SetUpCompiler(void) {
+  atexit(TearDownCompiler);
+  SetUpEngine();
 }
 
 /**
@@ -234,19 +233,19 @@ void Compile(char* source) {
   SetDefaultModule(source);
 
   // Global Variables
-  LLVMValueRef ds = CreateDataSegment();
+  LLVMValueRef ds = DefineDataSegment();
 
   // Global Functions
-  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
-  declare(s_max, "llvm.smax.i32", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False));
+  DefineFunction(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
+  DefineFunction(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
+  DefineFunction(s_max, "llvm.smax.i32", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False));
 
   // Main Begin
-  declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  enter(CreateBlock());
+  DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
+  EnterBlock(NewBlock());
 
-  dp = alloc(LLVMPointerType(LLVMInt8Type(), 0));
-  store(dp, ds);
+  dp = Alloc(LLVMPointerType(LLVMInt8Type(), 0));
+  Store(dp, ds);
 
   // Main Body
   FILE* fin = fopen(source, "r");
@@ -259,28 +258,28 @@ void Compile(char* source) {
   while ((command = fgetc(fin)) != EOF) {
     switch (command) {
     case '>':
-      move(1);
+      MovePointer(1);
       break;
     case '<':
-      move(-1);
+      MovePointer(-1);
       break;
     case '+':
-      update(1);
+      UpdateValue(1);
       break;
     case '-':
-      update(-1);
+      UpdateValue(-1);
       break;
     case ',':
-      input();
+      InputValue();
       break;
     case '.':
-      output();
+      OutputValue();
       break;
     case '[':
-      whileNotZero();
+      WhileNotZero();
       break;
     case ']':
-      whileEnd();
+      WhileEnd();
       break;
     default:
       /* Ignore Unknown command */
@@ -290,5 +289,5 @@ void Compile(char* source) {
   fclose(fin);
 
   // Main End
-  returnWith(Int32(0));
+  Return(Int32(0));
 }

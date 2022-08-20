@@ -28,6 +28,6 @@ typedef struct _Options {
   char* output;
 } *Options;
 
-Options CommandLineOptions(int, char**);
+Options ParseCommandLineArguments(int, char**);
 
 #endif

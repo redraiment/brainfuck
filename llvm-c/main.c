@@ -6,9 +6,9 @@
 #include "compiler.h"
 
 int main(int argc, char* argv[]) {
-  CompilerSetUp();
+  SetUpCompiler();
 
-  Options options = CommandLineOptions(argc, argv);
+  Options options = ParseCommandLineArguments(argc, argv);
   Compile(options->source);
   switch (options->mode) {
   case PreprocessMode:
