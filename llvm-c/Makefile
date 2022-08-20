@@ -1,5 +1,5 @@
 PROGRAM := compiler
-OBJECTS := main.o options.o llvm.o compiler.o
+OBJECTS := main.o options.o engine.o compiler.o
 
 CC := clang
 CFLAGS := $(shell llvm-config --cflags)

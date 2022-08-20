@@ -1,11 +1,11 @@
 /**
- * LLVM Wrap
+ * Compiler engine: wrap LLVM with single module.
  */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "llvm.h"
+#include "engine.h"
 
 /* inner default machine. */
 static LLVMTargetMachineRef machine = NULL;
@@ -19,7 +19,7 @@ static LLVMBuilderRef builder = NULL;
 /**
  * Destroy all LLVM resources.
  */
-static void LLVMTearDown(void) {
+static void EngineTearDown(void) {
   if (builder != NULL) {
     LLVMDisposeBuilder(builder);
   }
@@ -33,13 +33,11 @@ static void LLVMTearDown(void) {
 }
 
 /**
- * Initialize LLVM target machine with given source filename.
- * - create target machine.
- * - create module.
- * - create builder.
+ * Initialize LLVM target machine.
  */
-void LLVMSetUp(char* filename) {
-  // Initialize target machine
+void EngineSetUp() {
+  atexit(EngineTearDown);
+
   LLVMInitializeNativeTarget();
   LLVMInitializeNativeAsmPrinter();
   LLVMInitializeNativeAsmParser();
@@ -58,18 +56,21 @@ void LLVMSetUp(char* filename) {
     LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(),
     LLVMCodeGenLevelDefault, LLVMRelocDefault, LLVMCodeModelDefault
   );
+}
 
-  module = LLVMModuleCreateWithName(filename);
-  LLVMSetSourceFileName(module, filename, strlen(filename));
-  LLVMSetTarget(module, triple);
+/**
+ * Set the default module and builder with given module name.
+ */
+void SetDefaultModule(char* name) {
+  module = LLVMModuleCreateWithName(name);
+  LLVMSetSourceFileName(module, name, strlen(name));
+  LLVMSetTarget(module, LLVMGetDefaultTargetTriple());
 
   LLVMTargetDataRef layout = LLVMCreateTargetDataLayout(machine);
   LLVMSetDataLayout(module, LLVMCopyStringRepOfTargetData(layout));
   LLVMDisposeTargetData(layout);
 
   builder = LLVMCreateBuilder();
-
-  atexit(LLVMTearDown);
 }
 
 /* Global Declarations */

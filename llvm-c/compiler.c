@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "llvm.h"
+#include "engine.h"
 #include "compiler.h"
 
 /**
@@ -50,15 +50,6 @@ static void pop() {
     Stack top = stack;
     stack = stack->next;
     free(top);
-  }
-}
-
-/**
- * Remove all blocks.
- */
-static void BrainfuckTearDown(void) {
-  while (stack != NULL) {
-    pop();
   }
 }
 
@@ -136,34 +127,12 @@ static LLVMBasicBlockRef CreateBlock() {
   return Block(fn);
 }
 
-/**
- * Setup brainfuck skeleton.
- * - declare getchar.
- * - declare putchar.
- * - declare llvm.smax.i32.
- * - declare global data segment.
- * - create data pointer.
- */
-void BrainfuckSetUp(void) {
-  atexit(BrainfuckTearDown);
-
-  LLVMValueRef ds = CreateDataSegment();
-
-  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
-  declare(s_max, "llvm.smax.i32", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False));
-  declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-
-  enter(CreateBlock());
-
-  dp = alloc(LLVMPointerType(LLVMInt8Type(), 0));
-  store(dp, ds);
-}
+/* Eight Commands */
 
 /**
  * Build command `[`: while loop begin.
  */
-void whileNotZero(void) {
+static void whileNotZero(void) {
   LLVMBasicBlockRef entry = CreateBlock();
   jumpTo(entry);
 
@@ -175,7 +144,7 @@ void whileNotZero(void) {
 /**
  * Build command `]`: while loop end.
  */
-void whileEnd(void) {
+static void whileEnd(void) {
   // body
   LLVMBasicBlockRef entry = CurrentEntryBlock();
   jumpTo(entry);
@@ -196,7 +165,7 @@ void whileEnd(void) {
 /**
  * Bulid command `>` and `<`: move data pointer.
  */
-void move(int step) {
+static void move(int step) {
   LLVMValueRef pointer = load(LLVMPointerType(LLVMInt8Type(), 0), dp);
   store(dp, Pointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
 }
@@ -204,7 +173,7 @@ void move(int step) {
 /**
  * Build command `+` and `-`: apply offset to value of the data pointer.
  */
-void update(int offset) {
+static void update(int offset) {
   LLVMValueRef value = get();
   if (offset > 0) {
     value = add(value, Int8(offset));
@@ -217,7 +186,7 @@ void update(int offset) {
 /**
  * Build command ','.
  */
-void input(void) {
+static void input(void) {
   LLVMValueRef value = invoke(s_getchar, 0, (LLVMValueRef[]){});
   value = invoke(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
   value = truncate(value, LLVMInt8Type());
@@ -227,8 +196,99 @@ void input(void) {
 /**
  * Build command '.'.
  */
-void output(void) {
+static void output(void) {
   LLVMValueRef value = get();
   LLVMValueRef charactor = extend(value, LLVMInt32Type());
   invoke(s_putchar, 1, (LLVMValueRef[]){ charactor });
+}
+
+/* Compiler */
+
+/**
+ * Remove all blocks.
+ */
+static void CompilerTearDown(void) {
+  while (stack != NULL) {
+    pop();
+  }
+}
+
+/**
+ * Setup brainfuck skeleton.
+ * - declare getchar.
+ * - declare putchar.
+ * - declare llvm.smax.i32.
+ * - declare global data segment.
+ * - create data pointer.
+ */
+void CompilerSetUp(void) {
+  atexit(CompilerTearDown);
+
+  EngineSetUp();
+}
+
+/**
+ * Compile to default module.
+ */
+void Compile(char* source) {
+  SetDefaultModule(source);
+
+  // Global Variables
+  LLVMValueRef ds = CreateDataSegment();
+
+  // Global Functions
+  declare(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
+  declare(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
+  declare(s_max, "llvm.smax.i32", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False));
+
+  // Main Begin
+  declare(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
+  enter(CreateBlock());
+
+  dp = alloc(LLVMPointerType(LLVMInt8Type(), 0));
+  store(dp, ds);
+
+  // Main Body
+  FILE* fin = fopen(source, "r");
+  if (fin == NULL) {
+    fprintf(stderr, "Open source file %s failed!\n", source);
+    exit(EXIT_FAILURE);
+  }
+
+  int command = 0;
+  while ((command = fgetc(fin)) != EOF) {
+    switch (command) {
+    case '>':
+      move(1);
+      break;
+    case '<':
+      move(-1);
+      break;
+    case '+':
+      update(1);
+      break;
+    case '-':
+      update(-1);
+      break;
+    case ',':
+      input();
+      break;
+    case '.':
+      output();
+      break;
+    case '[':
+      whileNotZero();
+      break;
+    case ']':
+      whileEnd();
+      break;
+    default:
+      /* Ignore Unknown command */
+      break;
+    }
+  }
+  fclose(fin);
+
+  // Main End
+  returnWith(Int32(0));
 }

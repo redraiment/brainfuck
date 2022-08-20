@@ -1,5 +1,5 @@
-#ifndef __LLVM_H_
-#define __LLVM_H_
+#ifndef __ENGINE_H_
+#define __ENGINE_H_
 
 #include <llvm-c/Core.h>
 #include <llvm-c/Target.h>
@@ -11,7 +11,8 @@
 #define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), False)
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
 
-void LLVMSetUp(char*);
+void EngineSetUp();
+void SetDefaultModule(char*);
 
 LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
 LLVMValueRef DeclareGlobalVariableWithValue(char*, LLVMTypeRef, LLVMValueRef);
