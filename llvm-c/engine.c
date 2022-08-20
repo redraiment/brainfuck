@@ -38,6 +38,7 @@ static void TearDownEngine(void) {
 void SetUpEngine() {
   atexit(TearDownEngine);
 
+  LLVMLinkInMCJIT();
   LLVMInitializeNativeTarget();
   LLVMInitializeNativeAsmPrinter();
   LLVMInitializeNativeAsmParser();
@@ -265,4 +266,20 @@ void EmitObjectFile(char* filename) {
     LLVMDisposeMessage(message);
     exit(EXIT_FAILURE);
   }
+}
+
+/**
+ * Run machine code of main function with MCJIT execution engine.
+ */
+void ExecuteMachineCode() {
+  LLVMExecutionEngineRef engine = NULL;
+  char* message = NULL;
+  LLVMCreateJITCompilerForModule(&engine, module, 2, &message);
+  if (engine == NULL) {
+    fprintf(stderr, "Create JIT compiler failed: %s\n", message);
+    LLVMDisposeMessage(message);
+    exit(EXIT_FAILURE);
+  }
+  int (*fn)(void) = (int(*)(void))LLVMGetFunctionAddress(engine, "main");
+  fn();
 }

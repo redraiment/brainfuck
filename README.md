@@ -25,7 +25,7 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
   * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
   * [x] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
-  * [ ] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
+  * [x] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
   * [ ] Deploying with [docker](https://hub.docker.com/).
 
 ## Clojure Versions

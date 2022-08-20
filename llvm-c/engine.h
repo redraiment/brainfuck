@@ -4,6 +4,7 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/Target.h>
 #include <llvm-c/TargetMachine.h>
+#include <llvm-c/ExecutionEngine.h>
 
 #define False 0
 #define True 1
@@ -43,5 +44,6 @@ LLVMValueRef TruncateType(LLVMValueRef, LLVMTypeRef);
 
 void EmitIntermediateRepresentation(char*);
 void EmitObjectFile(char*);
+void ExecuteMachineCode(void);
 
 #endif

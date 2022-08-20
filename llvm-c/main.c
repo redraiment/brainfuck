@@ -16,7 +16,9 @@ int main(int argc, char* argv[]) {
     break;
   case CompileMode:
     EmitObjectFile(options->output);
+    break;
   case ScriptingMode:
+    ExecuteMachineCode();
     break;
   }
 
