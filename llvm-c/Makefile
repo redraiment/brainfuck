@@ -1,21 +1,25 @@
 PROGRAM := brainfuck
-OBJECTS := main.o options.o engine.o compiler.o linker.o
+SOURCES := main.c options.c engine.c ast.c scanner.c parser.c compiler.c linker.c
 
 CC := clang
 LEX := flex
+YACC := bison
 CFLAGS := $(shell llvm-config --cflags)
 LDFLAGS := $(shell llvm-config --ldflags --libs)
 
 all: $(PROGRAM)
 
-$(PROGRAM): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^
+$(PROGRAM): $(SOURCES)
+	$(CC) -lfl -ly $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) -o $@ $^
+# %.o: %.c
+# 	$(CC) -c $(CFLAGS) -o $@ $^
+
+%.c: %.y
+	$(YACC) -d -o $@ $^
 
 %.c: %.l
-	$(LEX) -o $@ $^
+	$(LEX) --header-file=$(^:.l=.h) -o $@ $^
 
 clean:
 	rm -f $(PROGRAM) $(OBJECTS)

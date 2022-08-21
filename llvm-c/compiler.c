@@ -1,5 +1,3 @@
-%option noyywrap nodefault yylineno
-%{
 /**
  * Brainfuck language command builder.
  */
@@ -7,57 +5,10 @@
 #include <stdio.h>
 
 #include "engine.h"
+#include "scanner.h"
+#include "parser.h"
+#include "ast.h"
 #include "compiler.h"
-%}
-
-%%
-
-"#".* {
-  /* Single line comment */
-}
-
-">" {
-  MovePointer(1);
-}
-
-"<" {
-  MovePointer(-1);
-}
-
-"+" {
-  UpdateValue(1);
-}
-
-"-" {
-  UpdateValue(-1);
-}
-
-"," {
-  InputValue();
-}
-
-"." {
-  OutputValue();
-}
-
-"[" {
-  WhileNotZero();
-}
-
-"]" {
-  WhileEnd();
-}
-
-<<EOF>> {
-  Return(Int32(0));
-  yyterminate();
-}
-
-.|\n {
-  /* Ignore comments */
-}
-
-%%
 
 /**
  * Stack segment for loop.
@@ -263,6 +214,7 @@ static void TearDownCompiler(void) {
   while (stack != NULL) {
     StackPop();
   }
+  DisposeAst(AstRoot);
 }
 
 /**
@@ -276,6 +228,38 @@ static void TearDownCompiler(void) {
 void SetUpCompiler(void) {
   atexit(TearDownCompiler);
   SetUpEngine();
+}
+
+/**
+ * Compile AST to LLVM IR.
+ */
+static void CompileAst(Ast ast) {
+  if (ast->previous != NULL) {
+    CompileAst(ast->previous);
+  }
+  if (ast->type == BlockNode) {
+    WhileNotZero();
+    CompileAst(ast->block);
+    WhileEnd();
+  } else {
+    switch (ast->instruction->symbol) {
+    case UpdateInstruction:
+      UpdateValue(ast->instruction->parameter);
+      break;
+    case MoveInstruction:
+      MovePointer(ast->instruction->parameter);
+      break;
+    case InputInstruction:
+      InputValue();
+      break;
+    case OutputInstruction:
+      OutputValue();
+      break;
+    default:
+      /* Unknown Instruction */
+      break;
+    }
+  }
 }
 
 /**
@@ -305,5 +289,8 @@ void Compile(char* source) {
     fprintf(stderr, "Open source file %s failed!\n", source);
     exit(EXIT_FAILURE);
   }
-  yylex();
+  yyparse();
+
+  CompileAst(AstRoot);
+  Return(Int32(0));
 }
