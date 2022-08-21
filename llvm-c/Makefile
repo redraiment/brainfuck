@@ -14,7 +14,7 @@ $(PROGRAM): $(OBJECTS)
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 
-%.c: %l
+%.c: %.l
 	$(LEX) -o $@ $^
 
 clean:
