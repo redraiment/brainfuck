@@ -22,7 +22,7 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
     * [x] Option for compile mode to emit object file.
     * [x] Option for show overview/help.
   * [x] Lexical analysis with [flex](https://github.com/westes/flex).
-  * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
+  * [x] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
   * [x] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Link mode to generate executable file.
