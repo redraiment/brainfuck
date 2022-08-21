@@ -12,6 +12,10 @@
 
 %%
 
+"#".* {
+  /* Single line comment */
+}
+
 ">" {
   MovePointer(1);
 }

@@ -53,6 +53,7 @@ Here are some key behaviors:
 
 | Character | Meaning |
 | -- | -- |
+| `#` | Single line comment. **It's not an offical EIGHT commands**. |
 | `>` | Increment the data pointer (to point to the next cell to the right). |
 | `<` | Decrement the data pointer (to point to the next cell to the left). |
 | `+` | Increment (increase by one) the byte at the data pointer. |
@@ -62,6 +63,8 @@ Here are some key behaviors:
 | `[` | If the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching `]` command. |
 | `]` | If the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching `[` command. |
 | others | Comments |
+
+**Note**: Single line comment command (`#`) was added to avoid file path conflict with commands. For example, there is `.` in `#!/bin/brainfuck.exe`, which is output command;
 
 # Getting Started
 
