@@ -63,3 +63,45 @@ void DisposeAst(Ast ast) {
     ast = previous;
   }
 }
+
+/**
+ * The Mergeable attribute of instruction symbol.
+ */
+static int MergeableInstructions[] = { 1, 1, 0, 0 };
+
+/**
+ * Return if the nodes are same (same node type and same instruction symbol)
+ * and mergeable (instruction type node only).
+ */
+static int AreSameAndMergeable(Ast this, Ast that) {
+  return (this->type == that->type)
+      && (this->type == InstructionNode)
+      && (this->instruction->symbol == that->instruction->symbol)
+      && (MergeableInstructions[this->instruction->symbol]);
+}
+
+/**
+ * Merge the serial and mergeable instruction.
+ */
+static void ReduceSerialMergeableInstructions(Ast ast) {
+  while (ast->previous != NULL) {
+    if (AreSameAndMergeable(ast, ast->previous)) {
+      Ast previous = ast->previous;
+      ast->instruction->parameter += previous->instruction->parameter;
+      ast->previous = previous->previous;
+      free(previous);
+    } else {
+      if (ast->type == BlockNode) {
+        ReduceSerialMergeableInstructions(ast->block);
+      }
+      ast = ast->previous;
+    }
+  }
+}
+
+/**
+ * Invoke AST optimizations.
+ */
+void OptimizeAst(Ast ast) {
+  ReduceSerialMergeableInstructions(ast);
+}

@@ -36,4 +36,6 @@ Ast NewInstructionNode(NodeType, Instruction, Ast);
 Ast NewBlockNode(NodeType, Ast, Ast);
 void DisposeAst(Ast);
 
+void OptimizeAst(Ast);
+
 #endif

@@ -290,7 +290,9 @@ void Compile(char* source) {
     exit(EXIT_FAILURE);
   }
   yyparse();
-
+  OptimizeAst(AstRoot);
   CompileAst(AstRoot);
+
+  // Main End
   Return(Int32(0));
 }
