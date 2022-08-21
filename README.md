@@ -53,7 +53,7 @@ Here are some key behaviors:
 
 | Character | Meaning |
 | -- | -- |
-| `#` | Single line comment. **It's not an offical EIGHT commands**. |
+| `#` | Single line comment. **It's an EXTRA command**. |
 | `>` | Increment the data pointer (to point to the next cell to the right). |
 | `<` | Decrement the data pointer (to point to the next cell to the left). |
 | `+` | Increment (increase by one) the byte at the data pointer. |
