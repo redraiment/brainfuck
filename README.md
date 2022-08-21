@@ -21,7 +21,7 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
     * [x] Option for preprocess mode to emit LLVM IR.
     * [x] Option for compile mode to emit object file.
     * [x] Option for show overview/help.
-  * [ ] Lexical analysis with [flex](https://www.gnu.org/software/flex/).
+  * [ ] Lexical analysis with [flex](https://github.com/westes/flex).
   * [ ] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
   * [x] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
@@ -143,6 +143,6 @@ Distrubuted under the GPLv3 License. See `LICENSE` for more information.
   * [GNU Autoconf](https://www.gnu.org/software/autoconf/)
   * [GNU Make](https://www.gnu.org/software/make/)
   * [GNU getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html)
-  * [GNU flex](https://www.gnu.org/software/flex/).
   * [GNU bison](https://www.gnu.org/software/bison/).
+* [flex](https://github.com/westes/flex).
 * [Docker](https://www.docker.com/).
