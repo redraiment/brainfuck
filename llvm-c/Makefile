@@ -11,9 +11,7 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(SOURCES)
 	$(CC) -lfl -ly $(CFLAGS) $(LDFLAGS) -o $@ $^
-
-# %.o: %.c
-# 	$(CC) -c $(CFLAGS) -o $@ $^
+	rm -f scanner.h scanner.c parser.h parser.c
 
 %.c: %.y
 	$(YACC) -d -o $@ $^
@@ -22,6 +20,6 @@ $(PROGRAM): $(SOURCES)
 	$(LEX) --header-file=$(^:.l=.h) -o $@ $^
 
 clean:
-	rm -f $(PROGRAM) $(OBJECTS)
+	rm -f $(PROGRAM)
 
 .PHONY: clean all
