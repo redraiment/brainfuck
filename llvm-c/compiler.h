@@ -6,4 +6,11 @@
 void SetUpCompiler(void);
 void Compile(char*);
 
+void WhileNotZero(void);
+void WhileEnd(void);
+void MovePointer(int);
+void UpdateValue(int);
+void InputValue(void);
+void OutputValue(void);
+
 #endif

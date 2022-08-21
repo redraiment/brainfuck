@@ -1,3 +1,5 @@
+%option noyywrap nodefault yylineno
+%{
 /**
  * Brainfuck language command builder.
  */
@@ -6,6 +8,52 @@
 
 #include "engine.h"
 #include "compiler.h"
+%}
+
+%%
+
+">" {
+  MovePointer(1);
+}
+
+"<" {
+  MovePointer(-1);
+}
+
+"+" {
+  UpdateValue(1);
+}
+
+"-" {
+  UpdateValue(-1);
+}
+
+"," {
+  InputValue();
+}
+
+"." {
+  OutputValue();
+}
+
+"[" {
+  WhileNotZero();
+}
+
+"]" {
+  WhileEnd();
+}
+
+<<EOF>> {
+  Return(Int32(0));
+  yyterminate();
+}
+
+.|\n {
+  /* Ignore comments */
+}
+
+%%
 
 /**
  * Stack segment for loop.
@@ -132,7 +180,7 @@ static LLVMBasicBlockRef NewBlock() {
 /**
  * Build command `[`: while loop begin.
  */
-static void WhileNotZero(void) {
+void WhileNotZero(void) {
   LLVMBasicBlockRef entry = NewBlock();
   Goto(entry);
 
@@ -144,7 +192,7 @@ static void WhileNotZero(void) {
 /**
  * Build command `]`: while loop end.
  */
-static void WhileEnd(void) {
+void WhileEnd(void) {
   // body
   LLVMBasicBlockRef entry = CurrentEntryBlock();
   Goto(entry);
@@ -165,7 +213,7 @@ static void WhileEnd(void) {
 /**
  * Bulid command `>` and `<`: move data pointer.
  */
-static void MovePointer(int step) {
+void MovePointer(int step) {
   LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
   Store(dp, GetPointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
 }
@@ -173,7 +221,7 @@ static void MovePointer(int step) {
 /**
  * Build command `+` and `-`: apply offset to value of the data pointer.
  */
-static void UpdateValue(int offset) {
+void UpdateValue(int offset) {
   LLVMValueRef value = GetValue();
   if (offset > 0) {
     value = Add(value, Int8(offset));
@@ -186,7 +234,7 @@ static void UpdateValue(int offset) {
 /**
  * Build command ','.
  */
-static void InputValue(void) {
+void InputValue(void) {
   LLVMValueRef value = InvokeFunction(s_getchar, 0, (LLVMValueRef[]){});
   value = InvokeFunction(s_max, 2, (LLVMValueRef[]){ value, Int32(0) });
   value = TruncateType(value, LLVMInt8Type());
@@ -196,7 +244,7 @@ static void InputValue(void) {
 /**
  * Build command '.'.
  */
-static void OutputValue(void) {
+void OutputValue(void) {
   LLVMValueRef value = GetValue();
   LLVMValueRef charactor = ExtendType(value, LLVMInt32Type());
   InvokeFunction(s_putchar, 1, (LLVMValueRef[]){ charactor });
@@ -248,46 +296,10 @@ void Compile(char* source) {
   Store(dp, ds);
 
   // Main Body
-  FILE* fin = fopen(source, "r");
-  if (fin == NULL) {
+  yyin = fopen(source, "r");
+  if (yyin == NULL) {
     fprintf(stderr, "Open source file %s failed!\n", source);
     exit(EXIT_FAILURE);
   }
-
-  int command = 0;
-  while ((command = fgetc(fin)) != EOF) {
-    switch (command) {
-    case '>':
-      MovePointer(1);
-      break;
-    case '<':
-      MovePointer(-1);
-      break;
-    case '+':
-      UpdateValue(1);
-      break;
-    case '-':
-      UpdateValue(-1);
-      break;
-    case ',':
-      InputValue();
-      break;
-    case '.':
-      OutputValue();
-      break;
-    case '[':
-      WhileNotZero();
-      break;
-    case ']':
-      WhileEnd();
-      break;
-    default:
-      /* Ignore Unknown command */
-      break;
-    }
-  }
-  fclose(fin);
-
-  // Main End
-  Return(Int32(0));
+  yylex();
 }
