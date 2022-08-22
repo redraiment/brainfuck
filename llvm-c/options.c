@@ -127,7 +127,7 @@ static void Help(void) {
 void ParseCommandLineArguments(int argc, char* argv[]) {
   atexit(TearDownOptions);
 
-  while (1) {
+  while (True) {
     int index = 0;
     int charactor = getopt_long(argc, argv, "crsmo:h", configs, &index);
     if (charactor < 0) {
