@@ -2,7 +2,9 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This is my learning project to practice building compilers with LLVM C API.
+This is my learning project to practice building compiler and interpreter with LLVM C API.
+
+The project is too complext for someone, who just want to implement a simple interpreter for Brainfuck. This [GIST](https://gist.github.com/redraiment/87413e5edc5c33458812492b5358ed61) is a good alternative, which implements an interpreter only one C file.
 
 # About the Project
 
@@ -10,22 +12,16 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 
 # Roadmap
 
-* [x] [ansi-c](https://github.com/redraiment/brainfuck/tree/main/ansi-c): an interpreter in pure ANSI C, without any third-party dependencies.
-* [ ] [llvm-c](https://github.com/redraiment/brainfuck/tree/main/llvm-c): a compiler and JIT interpreter in C with flex, bison and LLVM C API etc.
-  * [ ] Generating Makefile with [GNU Automake](https://www.gnu.org/software/automake/) and [GNU Autoconf](https://www.gnu.org/software/autoconf/).
-  * [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
-  * [x] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
-    * [x] Option for scripting mode to execute code.
-    * [x] Option for preprocess mode to emit LLVM IR.
-    * [x] Option for compile mode to emit object file.
-    * [x] Option for show overview/help.
-  * [x] Lexical analysis with [flex](https://github.com/westes/flex).
-  * [x] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
-  * [x] Preprocess mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
-  * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
-  * [x] Link mode to generate executable file.
-  * [x] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
-  * [ ] Deploying with [docker](https://hub.docker.com/).
+* [ ] Generating Makefile with [GNU Automake](https://www.gnu.org/software/automake/) and [GNU Autoconf](https://www.gnu.org/software/autoconf/).
+* [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
+* [x] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
+* [x] Lexical analysis with [flex](https://github.com/westes/flex).
+* [x] Syntax analysis with [bison](https://www.gnu.org/software/bison/).
+* [x] Creating LLVM IR file with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+* [x] Creating native object file with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
+* [x] Creating executable file with linker.
+* [x] Running script file with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
+* [ ] Deploying with [docker](https://hub.docker.com/).
 
 # Getting Started
 
