@@ -1,11 +1,25 @@
 %option noyywrap nodefault yylineno
 %{
+#include "options.h"
 #include "parser.h"
 %}
+
+%x COMMENT
+
 %%
 
-"#".* {
-  /* Single line comment */
+"#" {
+  if (options.singleLineCommentEnabled) {
+    BEGIN COMMENT;
+  }
+}
+
+<COMMENT>. {
+  /* Ignore in comment */
+}
+
+<COMMENT>\n {
+  BEGIN INITIAL;
 }
 
 ">" {
