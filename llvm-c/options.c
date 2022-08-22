@@ -9,10 +9,10 @@
  * Configurations for getopt_long.
  */
 static struct option configs[] = {
-  {"preprocess", no_argument, NULL, 'p'},
   {"compile", no_argument, NULL, 'c'},
-  {"link", no_argument, NULL, 'l'},
+  {"representation", no_argument, NULL, 'r'},
   {"script", no_argument, NULL, 's'},
+  {"enable-single-line-comment", no_argument, NULL, 'm'},
   {"output", required_argument, NULL, 'o'},
   {"help", no_argument, NULL, 'h'},
   {0, 0, 0, 0}
@@ -22,7 +22,8 @@ static struct option configs[] = {
  * Static shared space for default parsed command line options.
  */
 static struct _Options options = {
-  ScriptingMode,
+  LinkMode,
+  0,
   NULL,
   NULL,
   NULL,
@@ -45,12 +46,12 @@ static void TearDownOptions(void) {
 /**
  * Create file name: strip the source file's extension and append with suffix.
  */
-static char* CopyFileName(char* source, char* suffix) {
+static char* CopyFileName(char* source, int withExtension, char* suffix) {
   char* begin = strrchr(source, '/');
   if (begin == NULL) {
     begin = source;
   }
-  char* end = strrchr(begin, '.');
+  char* end = withExtension ? NULL : strrchr(begin, '.');
   if (end == NULL) {
     end = begin + strlen(begin);
   }
@@ -68,29 +69,52 @@ static char* CopyFileName(char* source, char* suffix) {
  * Show help and exit.
  */
 static void Help(void) {
-  fprintf(stderr, "Overview: brainfuck interpreter and compiler.\n\n");
+  fprintf(stderr, "Overview: brainfuck compiler and interpreter.\n\n");
 
   fprintf(stderr, "Usage: brainfuck [OPTIONS] <source-file>\n\n");
 
+  fprintf(stderr, "  It will create an executable file without options.\n\n");
+
   fprintf(stderr, "OPTIONS:\n\n");
 
-  fprintf(stderr, "  -c/--compile\n");
-  fprintf(stderr, "    Enable compile mode. Emit native object (.o).\n\n");
+  fprintf(stderr, "  -c/--compile\n\n");
+  fprintf(stderr, "    Only run preprocess, compile and assemble steps, then emit native object (.o) to output file.\n\n");
+  fprintf(stderr, "    By default, the object file name for a source file is made by replacing the extension with .o.\n\n");
 
-  fprintf(stderr, "  -l/--link\n");
-  fprintf(stderr, "    Enable link mode. Emit executable file.\n\n");
+  fprintf(stderr, "  -r/--representation\n\n");
+  fprintf(stderr, "    Emit LLVM representation (.ll) to standard output.\n\n");
 
-  fprintf(stderr, "  -p/--preprocess\n");
-  fprintf(stderr, "    Enable preprocess mode. Emit LLVM representation (.ll).\n\n");
+  fprintf(stderr, "  -s/--script\n\n");
+  fprintf(stderr, "    Run source file as Brainfuck script.\n\n");
 
-  fprintf(stderr, "  -s/--script\n");
-  fprintf(stderr, "    [DEFAULT] Enable scripting mode. Parse and execute in memory.\n\n");
-  
-  fprintf(stderr, "  -o/--output <output-file>\n");
+  fprintf(stderr, "  -m/--enable-single-line-comment\n\n");
+  fprintf(stderr, "    Enable single line comment command `#`.\n\n");
+  fprintf(stderr, "    It's useful used with Shebang.\n\n");
+
+  fprintf(stderr, "  -o/--output <output-file>\n\n");
   fprintf(stderr, "    Write output to file.\n\n");
+  fprintf(stderr, "    This applies to whatever sort of output is being produced, whether it be an executable file, an object file, an IR file.\n\n");
+  fprintf(stderr, "    If -o is not specified, the default executable file name for a source file is made by removing the extension.\n\n");
 
-  fprintf(stderr, "  -h/--help\n");
+  fprintf(stderr, "  -h/--help\n\n");
   fprintf(stderr, "    Show this help and exit.\n\n");
+
+  fprintf(stderr, "EXAMPLES:\n\n");
+
+  fprintf(stderr, "  1. Creating an executable file:\n\n");
+  fprintf(stderr, "    brainfuck helloworld.bf\n\n");
+
+  fprintf(stderr, "  2. Running a file as scripting:\n\n");
+  fprintf(stderr, "    brainfuck -s helloworld.bf\n\n");
+
+  fprintf(stderr, "  3. Using with Shebang:\n\n");
+  fprintf(stderr, "    #!/usr/local/bin/brainfuck -ms\n\n");
+
+  fprintf(stderr, "  4. Creating native object file:\n\n");
+  fprintf(stderr, "    brainfuck -c helloworld.bf\n\n");
+
+  fprintf(stderr, "  5. Creating LLVM representation file:\n\n");
+  fprintf(stderr, "    brainfuck -p helloworld.bf\n\n");
 
   fprintf(stderr, "Home page: <https://github.com/redraiment/brainfuck/>.\n");
   fprintf(stderr, "E-mail bug reports to: <redraiment@gmail.com>.\n");
@@ -103,23 +127,23 @@ static void Help(void) {
 Options ParseCommandLineArguments(int argc, char* argv[]) {
   while (1) {
     int index = 0;
-    int charactor = getopt_long(argc, argv, "hpclso:", configs, &index);
+    int charactor = getopt_long(argc, argv, "crsmo:h", configs, &index);
     if (charactor < 0) {
       break;
     }
 
     switch (charactor) {
-    case 'p':
-      options.mode = PreprocessMode;
-      break;
     case 'c':
       options.mode = CompileMode;
       break;
-    case 'l':
-      options.mode = LinkMode;
+    case 'r':
+      options.mode = RepresentationMode;
       break;
     case 's':
       options.mode = ScriptingMode;
+      break;
+    case 'm':
+      options.singleLineCommentEnabled = 1;
       break;
     case 'o':
       options.output = optarg;
@@ -137,16 +161,16 @@ Options ParseCommandLineArguments(int argc, char* argv[]) {
     Help();
   }
 
-  options.object = CopyFileName(options.source, ".o");
+  options.object = CopyFileName(options.source, 0, ".o");
   if (options.output == NULL) {
     if (options.mode == CompileMode) {
-      options.output = CopyFileName(options.source, ".o");
+      options.output = CopyFileName(options.source, 0, ".o");
     } else if (options.mode == LinkMode) {
-      options.output = CopyFileName(options.source, "");
+      options.output = CopyFileName(options.source, 0, "");
     }
   } else {
     // Clone a copy
-    options.output = CopyFileName(options.output, "");
+    options.output = CopyFileName(options.output, 1, "");
   }
 
   return &options;

@@ -5,14 +5,14 @@
  * Executing mode.
  */
 typedef enum {
-  /* Parse & execute */
-  ScriptingMode = 0,
-  /* Emit LLVM representation */
-  PreprocessMode,
+  /* Emit executable file */
+  LinkMode = 0,
   /* Emit native object */
   CompileMode,
-  /* Emit executable file */
-  LinkMode
+  /* Emit LLVM representation */
+  RepresentationMode,
+  /* Run directly */
+  ScriptingMode
 } Mode;
 
 /**
@@ -20,6 +20,10 @@ typedef enum {
  */
 typedef struct _Options {
   Mode mode;
+  /**
+   * Singe line command 
+   */
+  int singleLineCommentEnabled;
   /**
    * Source filename.
    */

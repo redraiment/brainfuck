@@ -12,18 +12,18 @@ int main(int argc, char* argv[]) {
   Options options = ParseCommandLineArguments(argc, argv);
   Compile(options->source);
   switch (options->mode) {
-  case PreprocessMode:
-    EmitIntermediateRepresentation(options->output);
+  case ScriptingMode:
+    ExecuteMachineCode();
     break;
   case CompileMode:
     EmitObjectFile(options->output);
     break;
-  case LinkMode:
+  case RepresentationMode:
+    EmitIntermediateRepresentation(options->output);
+    break;
+  default:
     EmitObjectFile(options->object);
     Link(options->object, options->output);
-    break;
-  case ScriptingMode:
-    ExecuteMachineCode();
     break;
   }
 
