@@ -7,23 +7,23 @@
 #include "linker.h"
 
 int main(int argc, char* argv[]) {
-  SetUpCompiler();
+  ParseCommandLineArguments(argc, argv);
 
-  Options options = ParseCommandLineArguments(argc, argv);
-  Compile(options->source);
-  switch (options->mode) {
+  SetUpCompiler();
+  Compile(options.source);
+  switch (options.mode) {
   case ScriptingMode:
     ExecuteMachineCode();
     break;
   case CompileMode:
-    EmitObjectFile(options->output);
+    EmitObjectFile(options.output);
     break;
   case RepresentationMode:
-    EmitIntermediateRepresentation(options->output);
+    EmitIntermediateRepresentation(options.output);
     break;
   default:
-    EmitObjectFile(options->object);
-    Link(options->object, options->output);
+    EmitObjectFile(options.object);
+    Link(options.object, options.output);
     break;
   }
 

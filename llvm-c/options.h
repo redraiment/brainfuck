@@ -38,6 +38,8 @@ typedef struct _Options {
   char* output;
 } *Options;
 
-Options ParseCommandLineArguments(int, char**);
+extern struct _Options options;
+
+void ParseCommandLineArguments(int, char**);
 
 #endif

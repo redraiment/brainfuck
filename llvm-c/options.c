@@ -19,9 +19,9 @@ static struct option configs[] = {
 };
 
 /**
- * Static shared space for default parsed command line options.
+ * Shared command line options.
  */
-static struct _Options options = {
+struct _Options options = {
   LinkMode,
   0,
   NULL,
@@ -124,7 +124,9 @@ static void Help(void) {
 /**
  * Parse command line arguments with getopt_long and return parsed options.
  */
-Options ParseCommandLineArguments(int argc, char* argv[]) {
+void ParseCommandLineArguments(int argc, char* argv[]) {
+  atexit(TearDownOptions);
+
   while (1) {
     int index = 0;
     int charactor = getopt_long(argc, argv, "crsmo:h", configs, &index);
@@ -172,6 +174,4 @@ Options ParseCommandLineArguments(int argc, char* argv[]) {
     // Clone a copy
     options.output = CopyFileName(options.output, 1, "");
   }
-
-  return &options;
 }
