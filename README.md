@@ -4,7 +4,7 @@
 
 This is my learning project to practice building compiler and interpreter with LLVM C API.
 
-The project is too complext for someone, who just want to implement a simple interpreter for Brainfuck. This [GIST](https://gist.github.com/redraiment/87413e5edc5c33458812492b5358ed61) is a good alternative, which implements an interpreter only one C file.
+The project is too complext for someone, who just want to implement a simple interpreter for Brainfuck. This [snippet](https://gist.github.com/redraiment/87413e5edc5c33458812492b5358ed61) is a better alternative, which implements the interpreter with one C file only.
 
 # About the Project
 
