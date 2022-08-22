@@ -1,4 +1,8 @@
 *.bf
 *.o
 *.ll
+*.log
 /brainfuck
+/config.h
+/config.status
+/Makefile

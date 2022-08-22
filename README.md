@@ -12,7 +12,7 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 
 # Roadmap
 
-* [ ] Generating Makefile with [GNU Automake](https://www.gnu.org/software/automake/) and [GNU Autoconf](https://www.gnu.org/software/autoconf/).
+* [x] Generating Makefile with [GNU Autoconf](https://www.gnu.org/software/autoconf/).
 * [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
 * [x] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
 * [x] Lexical analysis with [flex](https://github.com/westes/flex).
@@ -147,7 +147,6 @@ Distrubuted under the GPLv3 License. See `LICENSE` for more information.
 * [brainfuck.org](http://brainfuck.org/)
 * [LLVM.org](https://llvm.org/)
 * [GNU](https://www.gnu.org/)
-  * [GNU Automake](https://www.gnu.org/software/automake/)
   * [GNU Autoconf](https://www.gnu.org/software/autoconf/)
   * [GNU Make](https://www.gnu.org/software/make/)
   * [GNU getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html)

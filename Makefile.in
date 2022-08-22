@@ -1,0 +1,33 @@
+PROGRAM = @PACKAGE_NAME@
+OBJECTS = options.o engine.o ast.o parser.o scanner.o compiler.o linker.o main.o
+
+CC = @CC@
+LEX = @LEX@
+YACC = @YACC@
+LLVM_CONFIG := @LLVM_CONFIG@
+
+CFLAGS := $(shell $(LLVM_CONFIG) --cflags)
+LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags)
+LIBS := $(shell $(LLVM_CONFIG) --libs)
+
+all: $(PROGRAM)
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(LIBS) -o $@ $^
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) -o $@ $^
+
+parser.o: parser.c scanner.h
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+%.c %.h: %.l
+	$(LEX) --header-file=$*.h -o $*.c $^
+
+%.c %.h: %.y
+	$(YACC) -d -o $*.c $^
+
+clean:
+	rm -f $(PROGRAM) $(OBJECTS) parser.c parser.h scanner.c scanner.h
+
+.PHONY: clean all

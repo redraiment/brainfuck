@@ -4,12 +4,6 @@
 
 #include "linker.h"
 
-#define LINKER "/bin/ld"
-#define LOADER "/lib64/ld-linux-x86-64.so.2"
-#define C_RUNTIME_START "/lib/Scrt1.o"
-#define C_RUNTIME_INIT "/lib/crti.o"
-#define C_RUNTIME_FINI "/lib/crtn.o"
-
 /**
  * Invoke /bin/ld to link the object file to executable ELF file.
  */
