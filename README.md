@@ -40,32 +40,6 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
   * [ ] Executing with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
   * [ ] Deploying with [docker](https://hub.docker.com/).
 
-# Language Specification
-
-Here are some key behaviors:
-
-* Memory size: 30,000 bytes, and initialized to zero.
-* Data pointer initialized to point to the leftmost byte of the array.
-* Two streams of bytes for input and output.
-* End-of-file behavior: setting the cell to 0.
-* Use "\n" for end-of-line.
-* Commands:
-
-| Character | Meaning |
-| -- | -- |
-| `#` | Single line comment. **It's an EXTRA command**. |
-| `>` | Increment the data pointer (to point to the next cell to the right). |
-| `<` | Decrement the data pointer (to point to the next cell to the left). |
-| `+` | Increment (increase by one) the byte at the data pointer. |
-| `-` | Decrement (decrease by one) the byte at the data pointer. |
-| `.` | Output the byte at the data pointer. |
-| `,` | Accept one byte of input, storing its value in the byte at the data pointer. |
-| `[` | If the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching `]` command. |
-| `]` | If the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching `[` command. |
-| others | Comments |
-
-**Note**: Single line comment command (`#`) was added to avoid file path conflict with commands. For example, there is `.` in `#!/bin/brainfuck.exe`, which is output command;
-
 # Getting Started
 
 **TODO**
@@ -99,11 +73,38 @@ It will create an executable file default.
 4. Creating native object file: `brainfuck -c helloworld.bf`
 5. Creating LLVM representation file: `brainfuck -p helloworld.bf`
 
-# Snippets
+# Language Specification
+
+Here are some key behaviors:
+
+* Memory size: 30,000 bytes, and initialized to zero.
+* Data pointer initialized to point to the leftmost byte of the array.
+* Two streams of bytes for input and output.
+* End-of-file behavior: setting the cell to 0.
+* Use "\n" for end-of-line.
+
+## Commands
+
+| Character | Meaning |
+| -- | -- |
+| `>` | Increment the data pointer (to point to the next cell to the right). |
+| `<` | Decrement the data pointer (to point to the next cell to the left). |
+| `+` | Increment (increase by one) the byte at the data pointer. |
+| `-` | Decrement (decrease by one) the byte at the data pointer. |
+| `.` | Output the byte at the data pointer. |
+| `,` | Accept one byte of input, storing its value in the byte at the data pointer. |
+| `[` | If the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching `]` command. |
+| `]` | If the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching `[` command. |
+| `#` | Single line comment. **Disabled default**. |
+| others | Comments |
+
+**HINT**: Single line comment command (`#`) is an extra command to ignore the text until end-of-line. It was added to avoid command of shebang conflict with Brainfuck commands. For example, there is `-` in `#!/bin/brainfuck -s`, which is backward command of Brainfuck.
+
+## Snippets
 
 Here some Brainfuck snippets for testing.
 
-## Hello World
+### Hello World
 
 From [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!). It will write "Hello world" to standard output.
 
@@ -114,7 +115,7 @@ From [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!). It will 
 >.+++.------.--------.>+.>.
 ```
 
-## cat
+### cat
 
 It will read data from standard input and write to standard output directly, until end of file.
 
@@ -122,7 +123,7 @@ It will read data from standard input and write to standard output directly, unt
 ,[.,]
 ```
 
-## wc
+### wc
 
 from [brainfuck.org](http://brainfuck.org/wc.b). the standard (line and) word (and character) count utility.
 
