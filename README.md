@@ -2,15 +2,13 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This is my learning project to practice building compilers.
+This is my learning project to practice building compilers with LLVM C API.
 
 # About the Project
 
-I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) interpreters and compilers in my favorite programming languages (only Clojure and C for now, and perhaps Haskell in the future). Brainfuck language is simple enough, and it designed for implementing the smallest possible compiler.
+There are so many LLVM tutorials in C++, however, I'd like to build a compiler and interpreter with LLVM in C. Therefore, I created this project to build a compiler and JIT interpreter for [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck). Brainfuck language is simple enough, and it designed for implementing the smallest possible compiler.
 
 # Roadmap
-
-## C Versions
 
 * [x] [ansi-c](https://github.com/redraiment/brainfuck/tree/main/ansi-c): an interpreter in pure ANSI C, without any third-party dependencies.
 * [ ] [llvm-c](https://github.com/redraiment/brainfuck/tree/main/llvm-c): a compiler and JIT interpreter in C with flex, bison and LLVM C API etc.
@@ -27,17 +25,6 @@ I'd like to implement some [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) 
   * [x] Compile mode with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
   * [x] Link mode to generate executable file.
   * [x] Scripting mode with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
-  * [ ] Deploying with [docker](https://hub.docker.com/).
-
-## Clojure Versions
-
-* [ ] [clojure](https://github.com/redraiment/brainfuck/tree/main/clojure): compiler and JIT interpreter in Clojure with instaparse, JNA (to wrap LLVM) etc.
-  * [x] Building project with [leiningen](https://github.com/technomancy/leiningen).
-  * [x] Translating Brainfuck to Clojure in compiling time with Clojure macro.
-  * [ ] Lexical and Syntax analysis with [instaparse](https://github.com/Engelberg/instaparse).
-  * [ ] Executing with pure Clojure.
-  * [ ] Wrap LLVM with [JNA](https://github.com/java-native-access/jna).
-  * [ ] Executing with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
   * [ ] Deploying with [docker](https://hub.docker.com/).
 
 # Getting Started
