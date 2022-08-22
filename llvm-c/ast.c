@@ -67,7 +67,7 @@ void DisposeAst(Ast ast) {
 /**
  * The Mergeable attribute of instruction symbol.
  */
-static int MergeableInstructions[] = { 1, 1, 0, 0 };
+static Boolean MergeableInstructions[] = { True, True, False, False };
 
 /**
  * Return if the nodes are same (same node type and same instruction symbol)

@@ -100,7 +100,7 @@ static LLVMValueRef dp = NULL;
  * Get value of the data pointer.
  */
 static LLVMValueRef GetValue() {
-  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  LLVMValueRef pointer = Load(Int8PointerType, dp);
   return Load(LLVMInt8Type(), pointer);
 }
 
@@ -108,7 +108,7 @@ static LLVMValueRef GetValue() {
  * Set value to the data pointer.
  */
 static void SetValue(LLVMValueRef value) {
-  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  LLVMValueRef pointer = Load(Int8PointerType, dp);
   Store(pointer, value);
 }
 
@@ -169,7 +169,7 @@ void WhileEnd(void) {
  * Bulid command `>` and `<`: move data pointer.
  */
 void MovePointer(int step) {
-  LLVMValueRef pointer = Load(LLVMPointerType(LLVMInt8Type(), 0), dp);
+  LLVMValueRef pointer = Load(Int8PointerType, dp);
   Store(dp, GetPointer(LLVMInt8Type(), pointer, 1, (LLVMValueRef[]){ Int32(step) }));
 }
 
@@ -280,7 +280,7 @@ void Compile(char* source) {
   DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
   EnterBlock(NewBlock());
 
-  dp = Alloc(LLVMPointerType(LLVMInt8Type(), 0));
+  dp = Alloc(Int8PointerType);
   Store(dp, ds);
 
   // Main Body

@@ -1,6 +1,8 @@
 #ifndef __AST_H_
 #define __AST_H_
 
+#include "config.h"
+
 typedef enum {
   UpdateInstruction = 0,
   MoveInstruction,

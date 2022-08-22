@@ -1,6 +1,8 @@
 #ifndef __OPTIONS_H_
 #define __OPTIONS_H_
 
+#include "config.h"
+
 /**
  * Executing mode.
  */

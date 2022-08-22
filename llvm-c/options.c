@@ -23,7 +23,7 @@ static struct option configs[] = {
  */
 struct _Options options = {
   LinkMode,
-  0,
+  False,
   NULL,
   NULL,
   NULL,
@@ -46,7 +46,7 @@ static void TearDownOptions(void) {
 /**
  * Create file name: strip the source file's extension and append with suffix.
  */
-static char* CopyFileName(char* source, int withExtension, char* suffix) {
+static char* CopyFileName(char* source, Boolean withExtension, char* suffix) {
   char* begin = strrchr(source, '/');
   if (begin == NULL) {
     begin = source;
@@ -163,15 +163,15 @@ void ParseCommandLineArguments(int argc, char* argv[]) {
     Help();
   }
 
-  options.object = CopyFileName(options.source, 0, ".o");
+  options.object = CopyFileName(options.source, False, ".o");
   if (options.output == NULL) {
     if (options.mode == CompileMode) {
-      options.output = CopyFileName(options.source, 0, ".o");
+      options.output = CopyFileName(options.source, False, ".o");
     } else if (options.mode == LinkMode) {
-      options.output = CopyFileName(options.source, 0, "");
+      options.output = CopyFileName(options.source, False, "");
     }
   } else {
     // Clone a copy
-    options.output = CopyFileName(options.output, 1, "");
+    options.output = CopyFileName(options.output, False, "");
   }
 }
