@@ -76,13 +76,34 @@ Here are some key behaviors:
 
 # Usage
 
-**TODO**
+```sh
+brainfuck [OPTIONS] <source-file>
+```
+
+It will create an executable file default.
+
+## Options
+
+* `-c/--compile`: only run preprocess, compile and assemble steps, then emit native object (`.o`) to output file. By default, the object file name for a source file is made by replacing the extension with `.o`.
+* `-r/--representation`: emit LLVM representation (`.ll`) to standard output.
+* `-s/--script`: run source file as Brainfuck script.
+* `-m/--enable-single-line-comment`: enable single line comment command `#`. It's useful used with Shebang.
+* `-o/--output <output-file>`: write output to file. This applies to whatever sort of output is being produced, whether it be an executable file, an object file, an IR file. If `-o` is not specified, the default executable file name for a source file is made by removing the extension.
+* `-h/--help`: show this help and exit.
 
 ## Examples
 
-Here some Brainfuck examples for testing.
+1. Creating an executable file: `brainfuck helloworld.bf`
+2. Running a file as scripting: `brainfuck -s helloworld.bf`
+3. Using with Shebang: `#!/usr/local/bin/brainfuck -ms`
+4. Creating native object file: `brainfuck -c helloworld.bf`
+5. Creating LLVM representation file: `brainfuck -p helloworld.bf`
 
-### Hello World
+# Snippets
+
+Here some Brainfuck snippets for testing.
+
+## Hello World
 
 From [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!). It will write "Hello world" to standard output.
 
@@ -93,7 +114,7 @@ From [Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!). It will 
 >.+++.------.--------.>+.>.
 ```
 
-### cat
+## cat
 
 It will read data from standard input and write to standard output directly, until end of file.
 
@@ -101,7 +122,7 @@ It will read data from standard input and write to standard output directly, unt
 ,[.,]
 ```
 
-### wc
+## wc
 
 from [brainfuck.org](http://brainfuck.org/wc.b). the standard (line and) word (and character) count utility.
 
