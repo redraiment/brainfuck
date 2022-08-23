@@ -23,11 +23,6 @@ if test -z "$YACC"; then
   AC_MSG_ERROR([Cannot found bison.])
 fi
 
-AC_PATH_PROG([CLANG], [clang])
-if test -z "$CLANG"; then
-  AC_MSG_ERROR([Cannot found clang compiler.])
-fi
-
 AC_PATH_PROG([LINKER], [ld])
 if test -z "$LINKER"; then
   AC_MSG_ERROR([Cannot found ld.])
@@ -38,7 +33,6 @@ if test -z "$LLVM_CONFIG"; then
   AC_MSG_ERROR([Cannot found llvm-config.])
 fi
 
-CC=$CLANG
 ARCH=$(getconf LONG_BIT)
 AC_SUBST(ARCH)
 

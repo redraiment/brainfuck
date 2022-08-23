@@ -661,7 +661,6 @@ CC
 ARCH
 LLVM_CONFIG
 LINKER
-CLANG
 YACC
 LEX
 FIND
@@ -2434,54 +2433,6 @@ if test -z "$YACC"; then
   as_fn_error $? "Cannot found bison." "$LINENO" 5
 fi
 
-# Extract the first word of "clang", so it can be a program name with args.
-set dummy clang; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_CLANG+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  case $CLANG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_CLANG="$CLANG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_CLANG="$as_dir$ac_word$ac_exec_ext"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-CLANG=$ac_cv_path_CLANG
-if test -n "$CLANG"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $CLANG" >&5
-printf "%s\n" "$CLANG" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-if test -z "$CLANG"; then
-  as_fn_error $? "Cannot found clang compiler." "$LINENO" 5
-fi
 
 # Extract the first word of "ld", so it can be a program name with args.
 set dummy ld; ac_word=$2
@@ -2581,7 +2532,7 @@ if test -z "$LLVM_CONFIG"; then
   as_fn_error $? "Cannot found llvm-config." "$LINENO" 5
 fi
 
-CC=$CLANG
+# CC=$CLANG
 ARCH=$(getconf LONG_BIT)
 
 
