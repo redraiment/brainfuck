@@ -8,6 +8,7 @@
 
 autom4te.cache/
 *.log
+*~
 Makefile
 config.h
 config.status
