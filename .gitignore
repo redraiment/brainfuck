@@ -1,8 +1,27 @@
+# Ignore testing files
+
 *.bf
 *.o
 *.ll
+
+# Ignore Output of autoconf
+
+autom4te.cache/
 *.log
-/brainfuck
-/config.h
-/config.status
-/Makefile
+Makefile
+config.h
+config.status
+
+# Ignore Output of flex
+
+scanner.h
+scanner.c
+
+# Ignore Output of bison
+
+parser.h
+parser.c
+
+# Ignore program
+
+brainfuck
