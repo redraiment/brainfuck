@@ -25,11 +25,54 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 
 # Getting Started
 
-**TODO**
+The program can only working on Linux for now.
 
-## Prerequisites
+## Running using Docker (Recommended)
 
-## Installation
+```sh
+docker run --rm redraiment/brainfuck brainfuck -v
+```
+
+You can see below version information if the above command run success.
+
+```
+brainfuck v0.1.1
+
+Home page: <https://github.com/redraiment/brainfuck/>.
+E-mail bug reports to: <redraiment@gmail.com>.
+```
+
+Example for creating executable file and run it then:
+
+```sh
+docker run --rm -v $PWD:/root/ redraiment/brainfuck brainfuck hello-world.bf
+docker run --rm -v $PWD:/root/ redraiment/brainfuck ./hello-world
+```
+
+## Install with Source Code
+
+Install packages on ArchLinux:
+
+```sh
+sudo pacman -S binutils flex bison clang llvm make
+```
+
+Install packages on Ubuntu / Debain:
+
+```sh
+sudo apt install binutils flex bison clang llvm make
+```
+
+Build program:
+
+```
+wget https://github.com/redraiment/brainfuck/releases/download/v0.1.1/brainfuck-0.1.1.tar.gz
+tar xvf brainfuck-0.1.1.tar.gz
+cd brainfuck-0.1.1
+./configure CC=clang
+make
+sudo make install
+```
 
 # Usage
 
