@@ -15,6 +15,10 @@ AC_DEFUN([FIND_PROGRAM], [
   fi
 ])
 
+FIND_PROGRAM([MKDIR], [mkdir])
+FIND_PROGRAM([CP], [cp])
+FIND_PROGRAM([RM], [rm])
+FIND_PROGRAM([TAR], [tar])
 FIND_PROGRAM([FIND], [find])
 FIND_PROGRAM([LEX], [flex])
 FIND_PROGRAM([YACC], [bison])
@@ -68,7 +72,7 @@ AC_CHECK_HEADER([llvm-c/TargetMachine.h])
 
 # Checks for config.h
 AC_LANG([C])
-AC_PROG_CC([-Wall foreign])
+AC_PROG_CC([])
 AC_CONFIG_HEADERS([config.h])
 AH_TOP([
 /**

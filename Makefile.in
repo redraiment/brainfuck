@@ -1,6 +1,15 @@
 PROGRAM = @PACKAGE_NAME@
+TARNAME = @PACKAGE_TARNAME@
 OBJECTS = options.o engine.o ast.o parser.o scanner.o compiler.o linker.o main.o
+SOURCES = ast.c compiler.c engine.c linker.c options.c main.c parser.y scanner.l
+HEADERS = ast.h compiler.h engine.h linker.h options.h
+CONFIGS = configure Makefile.in config.h.in
+DOCUMENTS = LICENSE README.md
 
+MKDIR = @MKDIR@
+CP = @CP@
+RM = @RM@
+TAR = @TAR@
 CC = @CC@
 LEX = @LEX@
 YACC = @YACC@
@@ -9,6 +18,10 @@ LLVM_CONFIG := @LLVM_CONFIG@
 CFLAGS := $(shell $(LLVM_CONFIG) --cflags)
 LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags)
 LIBS := $(shell $(LLVM_CONFIG) --libs)
+
+prefix := @prefix@
+exec_prefix := @exec_prefix@
+bindir := @bindir@
 
 all: $(PROGRAM)
 
@@ -27,7 +40,17 @@ parser.o: parser.c scanner.h
 %.c %.h: %.y
 	$(YACC) -d -o $*.c $^
 
-clean:
-	rm -f $(PROGRAM) $(OBJECTS) parser.c parser.h scanner.c scanner.h
+install:
+	$(MKDIR) -p $(bindir)
+	$(CP) $(PROGRAM) $(bindir)
 
-.PHONY: clean all
+uninstall:
+	$(RM) -f $(bindir)/$(PROGRAM)
+
+dist:
+	$(TAR) zcvf $(TARNAME).tar.gz --transform "s#^#$(TARNAME)/#" $(SOURCES) $(HEADERS) $(CONFIGS) $(DOCUMENTS)
+
+clean:
+	$(RM) -f $(PROGRAM) $(OBJECTS) parser.c parser.h scanner.c scanner.h
+
+.PHONY: all install uninstall dist clean
