@@ -47,6 +47,7 @@ It will create an executable file default.
 * `-m/--enable-single-line-comment`: enable single line comment command `#`. It's useful used with Shebang.
 * `-o/--output <output-file>`: write output to file. This applies to whatever sort of output is being produced, whether it be an executable file, an object file, an IR file. If `-o` is not specified, the default executable file name for a source file is made by removing the extension.
 * `-h/--help`: show this help and exit.
+* `-v/--version`: show version and exit.
 
 ## Examples
 
