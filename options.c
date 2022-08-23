@@ -15,6 +15,7 @@ static struct option configs[] = {
   {"enable-single-line-comment", no_argument, NULL, 'm'},
   {"output", required_argument, NULL, 'o'},
   {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
   {0, 0, 0, 0}
 };
 
@@ -66,12 +67,21 @@ static char* CopyFileName(char* source, Boolean withExtension, char* suffix) {
 }
 
 /**
+ * Show bug report and exit.
+ */
+static void BugReport(void) {
+  fprintf(stderr, "Home page: <%s>.\n", PACKAGE_URL);
+  fprintf(stderr, "E-mail bug reports to: <%s>.\n", PACKAGE_BUGREPORT);
+  exit(EXIT_FAILURE);
+}
+
+/**
  * Show help and exit.
  */
 static void Help(void) {
   fprintf(stderr, "Overview: brainfuck compiler and interpreter.\n\n");
 
-  fprintf(stderr, "Usage: brainfuck [OPTIONS] <source-file>\n\n");
+  fprintf(stderr, "Usage: %s [OPTIONS] <source-file>\n\n", PACKAGE_NAME);
 
   fprintf(stderr, "  It will create an executable file without options.\n\n");
 
@@ -116,9 +126,16 @@ static void Help(void) {
   fprintf(stderr, "  5. Creating LLVM representation file:\n\n");
   fprintf(stderr, "    brainfuck -p helloworld.bf\n\n");
 
-  fprintf(stderr, "Home page: <https://github.com/redraiment/brainfuck/>.\n");
-  fprintf(stderr, "E-mail bug reports to: <redraiment@gmail.com>.\n");
-  exit(EXIT_FAILURE);
+  BugReport();
+}
+
+/**
+ * Show version and exit.
+ */
+void Version(void) {
+  fprintf(stderr, "%s v%s\n\n", PACKAGE_NAME, PACKAGE_VERSION);
+
+  BugReport();
 }
 
 /**
@@ -129,7 +146,7 @@ void ParseCommandLineArguments(int argc, char* argv[]) {
 
   while (True) {
     int index = 0;
-    int charactor = getopt_long(argc, argv, "crsmo:h", configs, &index);
+    int charactor = getopt_long(argc, argv, "crsmo:hv", configs, &index);
     if (charactor < 0) {
       break;
     }
@@ -150,6 +167,8 @@ void ParseCommandLineArguments(int argc, char* argv[]) {
     case 'o':
       options.output = optarg;
       break;
+    case 'v':
+      Version();
     default:
       Help();
       break;
