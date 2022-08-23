@@ -21,7 +21,7 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 * [x] Creating native object file with [LLVM C API](https://llvm.org/doxygen/group__LLVMC.html).
 * [x] Creating executable file with linker.
 * [x] Running script file with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
-* [ ] Deploying with [docker](https://hub.docker.com/).
+* [x] Deploying with [docker](https://hub.docker.com/).
 
 # Getting Started
 

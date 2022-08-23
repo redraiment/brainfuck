@@ -1,7 +1,7 @@
 # Brainfuck autoconf input script.
 
 AC_PREREQ([2.71])
-AC_INIT([brainfuck], [0.1.0],
+AC_INIT([brainfuck], [0.1.1],
         [redraiment@gmail.com],
         AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION,
         [https://github.com/redraiment/brainfuck/])
