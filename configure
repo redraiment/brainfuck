@@ -658,7 +658,6 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-ARCH
 LLVM_CONFIG
 LINKER
 YACC
@@ -1461,39 +1460,6 @@ fi
 
 } # ac_fn_c_try_compile
 
-# ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
-# -------------------------------------------------------
-# Tests whether HEADER exists and can be compiled using the include files in
-# INCLUDES, setting the cache variable VAR accordingly.
-ac_fn_c_check_header_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-printf %s "checking for $2... " >&6; }
-if eval test \${$3+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-#include <$2>
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  eval "$3=yes"
-else $as_nop
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_header_compile
-
 # ac_fn_c_try_link LINENO
 # -----------------------
 # Try to link conftest.$ac_ext, and return whether this succeeded.
@@ -1602,6 +1568,39 @@ printf "%s\n" "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_func
+
+# ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
+# -------------------------------------------------------
+# Tests whether HEADER exists and can be compiled using the include files in
+# INCLUDES, setting the cache variable VAR accordingly.
+ac_fn_c_check_header_compile ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+printf %s "checking for $2... " >&6; }
+if eval test \${$3+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  eval "$3=yes"
+else $as_nop
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_header_compile
 ac_configure_args_raw=
 for ac_arg
 do
@@ -2286,7 +2285,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 # Checks for Programs
-# Extract the first word of "find", so it can be a program name with args.
+
+
+
+  # Extract the first word of "find", so it can be a program name with args.
 set dummy find; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -2331,11 +2333,12 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-if test -z "$FIND"; then
-  as_fn_error $? "Cannot found find." "$LINENO" 5
-fi
+  if test -z $FIND; then
+    as_fn_error $? "Cannot found find." "$LINENO" 5
+  fi
 
-# Extract the first word of "flex", so it can be a program name with args.
+
+  # Extract the first word of "flex", so it can be a program name with args.
 set dummy flex; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -2380,11 +2383,12 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-if test -z "$LEX"; then
-  as_fn_error $? "Cannot found flex." "$LINENO" 5
-fi
+  if test -z $LEX; then
+    as_fn_error $? "Cannot found flex." "$LINENO" 5
+  fi
 
-# Extract the first word of "bison", so it can be a program name with args.
+
+  # Extract the first word of "bison", so it can be a program name with args.
 set dummy bison; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -2429,12 +2433,12 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-if test -z "$YACC"; then
-  as_fn_error $? "Cannot found bison." "$LINENO" 5
-fi
+  if test -z $YACC; then
+    as_fn_error $? "Cannot found bison." "$LINENO" 5
+  fi
 
 
-# Extract the first word of "ld", so it can be a program name with args.
+  # Extract the first word of "ld", so it can be a program name with args.
 set dummy ld; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -2479,11 +2483,12 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-if test -z "$LINKER"; then
-  as_fn_error $? "Cannot found ld." "$LINENO" 5
-fi
+  if test -z $LINKER; then
+    as_fn_error $? "Cannot found ld." "$LINENO" 5
+  fi
 
-# Extract the first word of "llvm-config", so it can be a program name with args.
+
+  # Extract the first word of "llvm-config", so it can be a program name with args.
 set dummy llvm-config; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -2528,34 +2533,66 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-if test -z "$LLVM_CONFIG"; then
-  as_fn_error $? "Cannot found llvm-config." "$LINENO" 5
-fi
+  if test -z $LLVM_CONFIG; then
+    as_fn_error $? "Cannot found llvm-config." "$LINENO" 5
+  fi
 
-# CC=$CLANG
+
+# Checks for static libraries.
+
+
+
+
+
+  LIBPATH=''
+
+    if test -d /lib; then
+      LIBPATH+=' /lib'
+    fi
+
+    if test -d /lib64x; then
+      LIBPATH+=' /lib64x'
+    fi
+
+    if test -d /usr/lib; then
+      LIBPATH+=' /usr/lib'
+    fi
+
+    if test -d /usr/lib64; then
+      LIBPATH+=' /usr/lib64'
+    fi
+
+
+
+  CRT1=$($FIND $LIBPATH -name Scrt1.o)
+  if test -z "$CRT1"; then
+    as_fn_error $? "Cannot found Scrt1.o." "$LINENO" 5
+  fi
+
+
+  CRTI=$($FIND $LIBPATH -name crti.o)
+  if test -z "$CRTI"; then
+    as_fn_error $? "Cannot found crti.o." "$LINENO" 5
+  fi
+
+
+  CRTN=$($FIND $LIBPATH -name crtn.o)
+  if test -z "$CRTN"; then
+    as_fn_error $? "Cannot found crtn.o." "$LINENO" 5
+  fi
+
+
+# Checks for dynamic libraries
 ARCH=$(getconf LONG_BIT)
-
-
-LIBPATH=''
-if test -d /lib; then
-  LIBPATH+=' /lib'
-fi
-if test -d /lib64; then
-  LIBPATH+=' /lib64'
-fi
-if test -d /usr/lib; then
-  LIBPATH+=' /usr/lib'
-fi
-if test -d /usr/lib64; then
-  LIBPATH+=' /usr/lib64'
+if test "$ARCH" = "32" -a -e "/lib/ld-linux.so.2"; then
+  LOADER='/lib/ld-linux.so.2'
+elif test "$ARCH" = "64" -a -e "/lib64/ld-linux-x86-64.so.2"; then
+  LOADER='/lib64/ld-linux-x86-64.so.2'
+else
+  as_fn_error $? "Cannot found ld.so." "$LINENO" 5
 fi
 
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
+# Checks for library functions.
 
 
 
@@ -3551,71 +3588,46 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-ac_config_headers="$ac_config_headers config.h"
 
+ac_fn_c_check_func "$LINENO" "calloc" "ac_cv_func_calloc"
+if test "x$ac_cv_func_calloc" = xyes
+then :
+  printf "%s\n" "#define HAVE_CALLOC 1" >>confdefs.h
 
+fi
+ac_fn_c_check_func "$LINENO" "free" "ac_cv_func_free"
+if test "x$ac_cv_func_free" = xyes
+then :
+  printf "%s\n" "#define HAVE_FREE 1" >>confdefs.h
 
-printf "%s\n" "#define False 0" >>confdefs.h
+fi
+ac_fn_c_check_func "$LINENO" "exit" "ac_cv_func_exit"
+if test "x$ac_cv_func_exit" = xyes
+then :
+  printf "%s\n" "#define HAVE_EXIT 1" >>confdefs.h
 
+fi
+ac_fn_c_check_func "$LINENO" "atexit" "ac_cv_func_atexit"
+if test "x$ac_cv_func_atexit" = xyes
+then :
+  printf "%s\n" "#define HAVE_ATEXIT 1" >>confdefs.h
 
-printf "%s\n" "#define True 1" >>confdefs.h
+fi
+ac_fn_c_check_func "$LINENO" "strlen" "ac_cv_func_strlen"
+if test "x$ac_cv_func_strlen" = xyes
+then :
+  printf "%s\n" "#define HAVE_STRLEN 1" >>confdefs.h
 
+fi
+ac_fn_c_check_func "$LINENO" "strrchr" "ac_cv_func_strrchr"
+if test "x$ac_cv_func_strrchr" = xyes
+then :
+  printf "%s\n" "#define HAVE_STRRCHR 1" >>confdefs.h
 
-
-printf "%s\n" "#define LINKER \"$LINKER\"" >>confdefs.h
-
-
-if test "$ARCH" = "32"; then
-  if test -e "/lib/ld-linux.so.2"; then
-
-printf "%s\n" "#define LOADER \"/lib/ld-linux.so.2\"" >>confdefs.h
-
-  else
-    as_fn_error $? "Cannot found /lib/ld-linux.so.2." "$LINENO" 5
-  fi
-else
-  if test -e "/lib64/ld-linux-x86-64.so.2"; then
-
-printf "%s\n" "#define LOADER \"/lib64/ld-linux-x86-64.so.2\"" >>confdefs.h
-
-  else
-    as_fn_error $? "Cannot found /lib64/ld-linux-x86-64.so.2." "$LINENO" 5
-  fi
 fi
 
-SCRT1=$($FIND $LIBPATH -name Scrt1.o)
-if test ! -z "$SCRT1"; then
-
-printf "%s\n" "#define C_RUNTIME_START \"$SCRT1\"" >>confdefs.h
-
-else
-  as_fn_error $? "Cannot found Scrt1.o." "$LINENO" 5
-fi
-
-CRTI=$($FIND $LIBPATH -name crti.o)
-if test ! -z "$CRTI"; then
-
-printf "%s\n" "#define C_RUNTIME_INIT \"$CRTI\"" >>confdefs.h
-
-else
-  as_fn_error $? "Cannot found crti.o." "$LINENO" 5
-fi
-
-CRTN=$($FIND $LIBPATH -name crtn.o)
-if test ! -z "$CRTN"; then
-
-printf "%s\n" "#define C_RUNTIME_FINI \"$CRTN\"" >>confdefs.h
-
-else
-  as_fn_error $? "Cannot found crtn.o." "$LINENO" 5
-fi
-
-
-
-# Checks for libraries.
 
 # Checks for header files.
-
 ac_header= ac_cache=
 for ac_item in $ac_header_c_list
 do
@@ -3694,46 +3706,458 @@ then :
 fi
 
 
+# Checks for config.h
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+if test -n "$ac_tool_prefix"; then
+  for ac_prog in -Wall foreign
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_CC+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="$ac_tool_prefix$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
+printf "%s\n" "$CC" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+    test -n "$CC" && break
+  done
+fi
+if test -z "$CC"; then
+  ac_ct_CC=$CC
+  for ac_prog in -Wall foreign
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_ac_ct_CC+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_ct_CC" >&5
+printf "%s\n" "$ac_ct_CC" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+  test -n "$ac_ct_CC" && break
+done
+
+  if test "x$ac_ct_CC" = x; then
+    CC=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+printf "%s\n" "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    CC=$ac_ct_CC
+  fi
+fi
+
+
+test -z "$CC" && { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "no acceptable C compiler found in \$PATH
+See \`config.log' for more details" "$LINENO" 5; }
+
+# Provide some information about the compiler.
+printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for C compiler version" >&5
+set X $ac_compile
+ac_compiler=$2
+for ac_option in --version -v -V -qversion -version; do
+  { { ac_try="$ac_compiler $ac_option >&5"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+printf "%s\n" "$ac_try_echo"; } >&5
+  (eval "$ac_compiler $ac_option >&5") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    sed '10a\
+... rest of stderr output deleted ...
+         10q' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+  fi
+  rm -f conftest.er1 conftest.err
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+done
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports GNU C" >&5
+printf %s "checking whether the compiler supports GNU C... " >&6; }
+if test ${ac_cv_c_compiler_gnu+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+#ifndef __GNUC__
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_compiler_gnu=yes
+else $as_nop
+  ac_compiler_gnu=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ac_cv_c_compiler_gnu=$ac_compiler_gnu
+
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_compiler_gnu" >&5
+printf "%s\n" "$ac_cv_c_compiler_gnu" >&6; }
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+if test $ac_compiler_gnu = yes; then
+  GCC=yes
+else
+  GCC=
+fi
+ac_test_CFLAGS=${CFLAGS+y}
+ac_save_CFLAGS=$CFLAGS
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -g" >&5
+printf %s "checking whether $CC accepts -g... " >&6; }
+if test ${ac_cv_prog_cc_g+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
+   ac_cv_prog_cc_g=no
+   CFLAGS="-g"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_prog_cc_g=yes
+else $as_nop
+  CFLAGS=""
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+else $as_nop
+  ac_c_werror_flag=$ac_save_c_werror_flag
+	 CFLAGS="-g"
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_prog_cc_g=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+   ac_c_werror_flag=$ac_save_c_werror_flag
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_g" >&5
+printf "%s\n" "$ac_cv_prog_cc_g" >&6; }
+if test $ac_test_CFLAGS; then
+  CFLAGS=$ac_save_CFLAGS
+elif test $ac_cv_prog_cc_g = yes; then
+  if test "$GCC" = yes; then
+    CFLAGS="-g -O2"
+  else
+    CFLAGS="-g"
+  fi
+else
+  if test "$GCC" = yes; then
+    CFLAGS="-O2"
+  else
+    CFLAGS=
+  fi
+fi
+ac_prog_cc_stdc=no
+if test x$ac_prog_cc_stdc = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC option to enable C11 features" >&5
+printf %s "checking for $CC option to enable C11 features... " >&6; }
+if test ${ac_cv_prog_cc_c11+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_prog_cc_c11=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_c_conftest_c11_program
+_ACEOF
+for ac_arg in '' -std=gnu11
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_prog_cc_c11=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam
+  test "x$ac_cv_prog_cc_c11" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+fi
+
+if test "x$ac_cv_prog_cc_c11" = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+printf "%s\n" "unsupported" >&6; }
+else $as_nop
+  if test "x$ac_cv_prog_cc_c11" = x
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+printf "%s\n" "none needed" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c11" >&5
+printf "%s\n" "$ac_cv_prog_cc_c11" >&6; }
+     CC="$CC $ac_cv_prog_cc_c11"
+fi
+  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c11
+  ac_prog_cc_stdc=c11
+fi
+fi
+if test x$ac_prog_cc_stdc = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC option to enable C99 features" >&5
+printf %s "checking for $CC option to enable C99 features... " >&6; }
+if test ${ac_cv_prog_cc_c99+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_prog_cc_c99=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_c_conftest_c99_program
+_ACEOF
+for ac_arg in '' -std=gnu99 -std=c99 -c99 -qlanglvl=extc1x -qlanglvl=extc99 -AC99 -D_STDC_C99=
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_prog_cc_c99=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam
+  test "x$ac_cv_prog_cc_c99" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+fi
+
+if test "x$ac_cv_prog_cc_c99" = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+printf "%s\n" "unsupported" >&6; }
+else $as_nop
+  if test "x$ac_cv_prog_cc_c99" = x
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+printf "%s\n" "none needed" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c99" >&5
+printf "%s\n" "$ac_cv_prog_cc_c99" >&6; }
+     CC="$CC $ac_cv_prog_cc_c99"
+fi
+  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c99
+  ac_prog_cc_stdc=c99
+fi
+fi
+if test x$ac_prog_cc_stdc = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC option to enable C89 features" >&5
+printf %s "checking for $CC option to enable C89 features... " >&6; }
+if test ${ac_cv_prog_cc_c89+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_prog_cc_c89=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_c_conftest_c89_program
+_ACEOF
+for ac_arg in '' -qlanglvl=extc89 -qlanglvl=ansi -std -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_prog_cc_c89=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam
+  test "x$ac_cv_prog_cc_c89" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+fi
+
+if test "x$ac_cv_prog_cc_c89" = xno
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+printf "%s\n" "unsupported" >&6; }
+else $as_nop
+  if test "x$ac_cv_prog_cc_c89" = x
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+printf "%s\n" "none needed" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c89" >&5
+printf "%s\n" "$ac_cv_prog_cc_c89" >&6; }
+     CC="$CC $ac_cv_prog_cc_c89"
+fi
+  ac_cv_prog_cc_stdc=$ac_cv_prog_cc_c89
+  ac_prog_cc_stdc=c89
+fi
+fi
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+ac_config_headers="$ac_config_headers config.h"
+
+
+
+
+printf "%s\n" "#define False 0" >>confdefs.h
+
+
+printf "%s\n" "#define True 1" >>confdefs.h
+
+
+
+printf "%s\n" "#define LINKER \"$LINKER\"" >>confdefs.h
+
+
+printf "%s\n" "#define LOADER \"$LOADER\"" >>confdefs.h
+
+
+printf "%s\n" "#define C_RUNTIME_START \"$CRT1\"" >>confdefs.h
+
+
+printf "%s\n" "#define C_RUNTIME_INIT \"$CRTI\"" >>confdefs.h
+
+
+printf "%s\n" "#define C_RUNTIME_FINI \"$CRTN\"" >>confdefs.h
+
+
+
+
 # Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
-ac_fn_c_check_func "$LINENO" "calloc" "ac_cv_func_calloc"
-if test "x$ac_cv_func_calloc" = xyes
-then :
-  printf "%s\n" "#define HAVE_CALLOC 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "free" "ac_cv_func_free"
-if test "x$ac_cv_func_free" = xyes
-then :
-  printf "%s\n" "#define HAVE_FREE 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "exit" "ac_cv_func_exit"
-if test "x$ac_cv_func_exit" = xyes
-then :
-  printf "%s\n" "#define HAVE_EXIT 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "atexit" "ac_cv_func_atexit"
-if test "x$ac_cv_func_atexit" = xyes
-then :
-  printf "%s\n" "#define HAVE_ATEXIT 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "strlen" "ac_cv_func_strlen"
-if test "x$ac_cv_func_strlen" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRLEN 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "strrchr" "ac_cv_func_strrchr"
-if test "x$ac_cv_func_strrchr" = xyes
-then :
-  printf "%s\n" "#define HAVE_STRRCHR 1" >>confdefs.h
-
-fi
-
 
 ac_config_files="$ac_config_files Makefile"
 

@@ -8,50 +8,67 @@ AC_INIT([brainfuck], [0.1.0],
 AC_COPYRIGHT([Copyright (c) Zhang, Zepeng <redraiment@gmail.com>])
 
 # Checks for Programs
-AC_PATH_PROG([FIND], [find])
-if test -z "$FIND"; then
-  AC_MSG_ERROR([Cannot found find.])
-fi
+AC_DEFUN([FIND_PROGRAM], [
+  AC_PATH_PROG([$1], [$2])
+  if test -z $[$1]; then
+    AC_MSG_ERROR([Cannot found $2.])
+  fi
+])
 
-AC_PATH_PROG([LEX], [flex])
-if test -z "$LEX"; then
-  AC_MSG_ERROR([Cannot found flex.])
-fi
+FIND_PROGRAM([FIND], [find])
+FIND_PROGRAM([LEX], [flex])
+FIND_PROGRAM([YACC], [bison])
+FIND_PROGRAM([LINKER], [ld])
+FIND_PROGRAM([LLVM_CONFIG], [llvm-config])
 
-AC_PATH_PROG([YACC], [bison])
-if test -z "$YACC"; then
-  AC_MSG_ERROR([Cannot found bison.])
-fi
+# Checks for static libraries.
+AC_DEFUN([FIND_EXISTING_DIRS], [
+  $1=''
+  m4_foreach([dir], [$2], [
+    if test -d dir; then
+      $1+=[' ]dir[']
+    fi
+  ])
+])
 
-AC_PATH_PROG([LINKER], [ld])
-if test -z "$LINKER"; then
-  AC_MSG_ERROR([Cannot found ld.])
-fi
+AC_DEFUN([FIND_OBJECT], [
+  $1=$($FIND [$2] -name [$3])
+  if test -z "[$]$1"; then
+    AC_MSG_ERROR([Cannot found ]$3[.])
+  fi
+])
 
-AC_PATH_PROG([LLVM_CONFIG], [llvm-config])
-if test -z "$LLVM_CONFIG"; then
-  AC_MSG_ERROR([Cannot found llvm-config.])
-fi
+FIND_EXISTING_DIRS([LIBPATH], [/lib, /lib64x, /usr/lib, /usr/lib64])
+FIND_OBJECT([CRT1], [$LIBPATH], [Scrt1.o])
+FIND_OBJECT([CRTI], [$LIBPATH], [crti.o])
+FIND_OBJECT([CRTN], [$LIBPATH], [crtn.o])
 
+# Checks for dynamic libraries
 ARCH=$(getconf LONG_BIT)
-AC_SUBST(ARCH)
-
-LIBPATH=''
-if test -d /lib; then
-  LIBPATH+=' /lib'
-fi
-if test -d /lib64; then
-  LIBPATH+=' /lib64'
-fi
-if test -d /usr/lib; then
-  LIBPATH+=' /usr/lib'
-fi
-if test -d /usr/lib64; then
-  LIBPATH+=' /usr/lib64'
+if test "$ARCH" = "32" -a -e "/lib/ld-linux.so.2"; then
+  LOADER='/lib/ld-linux.so.2'
+elif test "$ARCH" = "64" -a -e "/lib64/ld-linux-x86-64.so.2"; then
+  LOADER='/lib64/ld-linux-x86-64.so.2'
+else
+  AC_MSG_ERROR([Cannot found ld.so.])
 fi
 
+# Checks for library functions.
+AC_CHECK_FUNCS([calloc free exit atexit strlen strrchr])
+
+# Checks for header files.
+AC_CHECK_HEADER([stdio.h])
+AC_CHECK_HEADER([string.h])
+AC_CHECK_HEADER([stdlib.h])
+AC_CHECK_HEADER([getopt.h])
+AC_CHECK_HEADER([llvm-c/Core.h])
+AC_CHECK_HEADER([llvm-c/ExecutionEngine.h])
+AC_CHECK_HEADER([llvm-c/Target.h])
+AC_CHECK_HEADER([llvm-c/TargetMachine.h])
+
+# Checks for config.h
 AC_LANG([C])
-AC_PROG_CC([])
+AC_PROG_CC([-Wall foreign])
 AC_CONFIG_HEADERS([config.h])
 AH_TOP([
 /**
@@ -66,66 +83,21 @@ AH_TOP([
 
 typedef int Boolean;
 ])
+
 AC_DEFINE([False], [0], [Define to the false of Boolean type.])
 AC_DEFINE([True], [1], [Define to the True of Boolean type.])
 
 AC_DEFINE_UNQUOTED([LINKER], "$LINKER", [Define to linker file path.])
-
-if test "$ARCH" = "32"; then
-  if test -e "/lib/ld-linux.so.2"; then
-    AC_DEFINE_UNQUOTED([LOADER], "/lib/ld-linux.so.2", [Define to loader file path.])
-  else
-    AC_MSG_ERROR([Cannot found /lib/ld-linux.so.2.])
-  fi
-else
-  if test -e "/lib64/ld-linux-x86-64.so.2"; then
-    AC_DEFINE_UNQUOTED([LOADER], "/lib64/ld-linux-x86-64.so.2", [Define to loader file path.])
-  else
-    AC_MSG_ERROR([Cannot found /lib64/ld-linux-x86-64.so.2.])
-  fi
-fi
-
-SCRT1=$($FIND $LIBPATH -name Scrt1.o)
-if test ! -z "$SCRT1"; then
-  AC_DEFINE_UNQUOTED([C_RUNTIME_START], "$SCRT1", [Define to c runtime start])
-else
-  AC_MSG_ERROR([Cannot found Scrt1.o.])
-fi
-
-CRTI=$($FIND $LIBPATH -name crti.o)
-if test ! -z "$CRTI"; then
-  AC_DEFINE_UNQUOTED([C_RUNTIME_INIT], "$CRTI", [Define to c runtime init])
-else
-  AC_MSG_ERROR([Cannot found crti.o.])
-fi
-
-CRTN=$($FIND $LIBPATH -name crtn.o)
-if test ! -z "$CRTN"; then
-  AC_DEFINE_UNQUOTED([C_RUNTIME_FINI], "$CRTN", [Define to c runtime fini])
-else
-  AC_MSG_ERROR([Cannot found crtn.o.])
-fi
+AC_DEFINE_UNQUOTED([LOADER], "$LOADER", [Define to loader file path.])
+AC_DEFINE_UNQUOTED([C_RUNTIME_START], "$CRT1", [Define to c runtime start])
+AC_DEFINE_UNQUOTED([C_RUNTIME_INIT], "$CRTI", [Define to c runtime init])
+AC_DEFINE_UNQUOTED([C_RUNTIME_FINI], "$CRTN", [Define to c runtime fini])
 
 AH_BOTTOM([
 #endif
 ])
 
-# Checks for libraries.
-
-# Checks for header files.
-AC_CHECK_HEADER([stdio.h])
-AC_CHECK_HEADER([string.h])
-AC_CHECK_HEADER([stdlib.h])
-AC_CHECK_HEADER([getopt.h])
-AC_CHECK_HEADER([llvm-c/Core.h])
-AC_CHECK_HEADER([llvm-c/ExecutionEngine.h])
-AC_CHECK_HEADER([llvm-c/Target.h])
-AC_CHECK_HEADER([llvm-c/TargetMachine.h])
-
 # Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
-AC_CHECK_FUNCS([calloc free exit atexit strlen strrchr])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
