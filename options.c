@@ -124,7 +124,7 @@ static void Help(void) {
   fprintf(stderr, "    brainfuck -c helloworld.bf\n\n");
 
   fprintf(stderr, "  5. Creating LLVM representation file:\n\n");
-  fprintf(stderr, "    brainfuck -p helloworld.bf\n\n");
+  fprintf(stderr, "    brainfuck -r helloworld.bf\n\n");
 
   BugReport();
 }
