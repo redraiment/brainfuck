@@ -17,7 +17,7 @@ LLVM_CONFIG := @LLVM_CONFIG@
 
 CFLAGS := $(shell $(LLVM_CONFIG) --cflags)
 LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags)
-LIBS := $(shell $(LLVM_CONFIG) --libs)
+LIBS := $(shell $(LLVM_CONFIG) --libs --link-static)
 
 prefix := @prefix@
 exec_prefix := @exec_prefix@
@@ -26,7 +26,7 @@ bindir := @bindir@
 all: $(PROGRAM)
 
 $(PROGRAM): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(LIBS) -o $@ $^
+	$(CC) -fuse-ld=lld -static -o $@ $(LDFLAGS) -lstdc++ -lc -lm -lz -ltinfo $(LIBS) $^
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^

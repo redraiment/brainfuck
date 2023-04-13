@@ -1,7 +1,7 @@
 # Brainfuck autoconf input script.
 
 AC_PREREQ([2.71])
-AC_INIT([brainfuck], [0.1.3],
+AC_INIT([brainfuck], [0.2.0],
         [redraiment@gmail.com],
         AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION,
         [https://github.com/redraiment/brainfuck/])
@@ -22,43 +22,11 @@ FIND_PROGRAM([TAR], [tar])
 FIND_PROGRAM([FIND], [find])
 FIND_PROGRAM([LEX], [flex])
 FIND_PROGRAM([YACC], [bison])
-FIND_PROGRAM([LINKER], [ld])
 FIND_PROGRAM([LLVM_CONFIG], [llvm-config])
-
-# Checks for static libraries.
-AC_DEFUN([FIND_EXISTING_DIRS], [
-  $1=''
-  m4_foreach([dir], [$2], [
-    if test -d dir; then
-      $1+=[' ]dir[']
-    fi
-  ])
-])
-
-AC_DEFUN([FIND_OBJECT], [
-  $1=$($FIND [$2] -name [$3])
-  if test -z "[$]$1"; then
-    AC_MSG_ERROR([Cannot found ]$3[.])
-  fi
-])
-
-FIND_EXISTING_DIRS([LIBPATH], [/lib, /lib64x, /usr/lib, /usr/lib64])
-FIND_OBJECT([CRT1], [$LIBPATH], [Scrt1.o])
-FIND_OBJECT([CRTI], [$LIBPATH], [crti.o])
-FIND_OBJECT([CRTN], [$LIBPATH], [crtn.o])
-
-# Checks for dynamic libraries
-ARCH=$(getconf LONG_BIT)
-if test "$ARCH" = "32" -a -e "/lib/ld-linux.so.2"; then
-  LOADER='/lib/ld-linux.so.2'
-elif test "$ARCH" = "64" -a -e "/lib64/ld-linux-x86-64.so.2"; then
-  LOADER='/lib64/ld-linux-x86-64.so.2'
-else
-  AC_MSG_ERROR([Cannot found ld.so.])
-fi
+FIND_PROGRAM([LINKER], [ld.lld])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([calloc free exit atexit strlen strrchr])
+AC_CHECK_FUNCS([calloc free exit strlen strrchr])
 
 # Checks for header files.
 AC_CHECK_HEADER([stdio.h])
@@ -72,7 +40,7 @@ AC_CHECK_HEADER([llvm-c/TargetMachine.h])
 
 # Checks for config.h
 AC_LANG([C])
-AC_PROG_CC([])
+AC_PROG_CC([clang])
 AC_CONFIG_HEADERS([config.h])
 AH_TOP([
 /**
@@ -90,12 +58,6 @@ typedef int Boolean;
 
 AC_DEFINE([False], [0], [Define to the false of Boolean type.])
 AC_DEFINE([True], [1], [Define to the True of Boolean type.])
-
-AC_DEFINE_UNQUOTED([LINKER], "$LINKER", [Define to linker file path.])
-AC_DEFINE_UNQUOTED([LOADER], "$LOADER", [Define to loader file path.])
-AC_DEFINE_UNQUOTED([C_RUNTIME_START], "$CRT1", [Define to c runtime start])
-AC_DEFINE_UNQUOTED([C_RUNTIME_INIT], "$CRTI", [Define to c runtime init])
-AC_DEFINE_UNQUOTED([C_RUNTIME_FINI], "$CRTN", [Define to c runtime fini])
 
 AH_BOTTOM([
 #endif

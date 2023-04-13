@@ -36,7 +36,7 @@ docker run --rm redraiment/brainfuck brainfuck -v
 You can see below version information if the above command run success.
 
 ```
-brainfuck v0.1.3
+brainfuck v0.2.0
 
 Home page: <https://github.com/redraiment/brainfuck/>.
 E-mail bug reports to: <redraiment@gmail.com>.
@@ -66,9 +66,9 @@ sudo apt install binutils flex bison clang llvm make
 Build program:
 
 ```
-wget https://github.com/redraiment/brainfuck/releases/download/v0.1.3/brainfuck-0.1.3.tar.gz
-tar xvf brainfuck-0.1.3.tar.gz
-cd brainfuck-0.1.3
+wget https://github.com/redraiment/brainfuck/releases/download/v0.2.0/brainfuck-0.2.0.tar.gz
+tar xvf brainfuck-0.2.0.tar.gz
+cd brainfuck-0.2.0
 ./configure CC=clang
 make
 sudo make install
