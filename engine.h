@@ -14,6 +14,7 @@
 #define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), False)
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
 
+void TearDownEngine(void);
 void SetUpEngine();
 void SetDefaultModule(char*);
 

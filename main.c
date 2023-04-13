@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
     Link(options.object, options.output);
     break;
   }
+  TearDownCompiler();
 
   return 0;
 }

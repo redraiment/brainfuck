@@ -1,7 +1,6 @@
 /**
  * Brainfuck language command builder.
  */
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "engine.h"
@@ -210,7 +209,8 @@ void OutputValue(void) {
 /**
  * Remove all blocks.
  */
-static void TearDownCompiler(void) {
+void TearDownCompiler(void) {
+  TearDownEngine();
   while (stack != NULL) {
     StackPop();
   }
@@ -226,7 +226,6 @@ static void TearDownCompiler(void) {
  * - create data pointer.
  */
 void SetUpCompiler(void) {
-  atexit(TearDownCompiler);
   SetUpEngine();
 }
 

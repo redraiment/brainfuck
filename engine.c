@@ -19,15 +19,18 @@ static LLVMBuilderRef builder = NULL;
 /**
  * Destroy all LLVM resources.
  */
-static void TearDownEngine(void) {
+void TearDownEngine(void) {
   if (builder != NULL) {
     LLVMDisposeBuilder(builder);
+    builder = NULL;
   }
   if (module != NULL) {
     LLVMDisposeModule(module);
+    module = NULL;
   }
   if (machine != NULL) {
     LLVMDisposeTargetMachine(machine);
+    machine = NULL;
   }
   LLVMShutdown();
 }
@@ -36,8 +39,6 @@ static void TearDownEngine(void) {
  * Initialize LLVM target machine.
  */
 void SetUpEngine() {
-  atexit(TearDownEngine);
-
   LLVMLinkInMCJIT();
   LLVMInitializeNativeTarget();
   LLVMInitializeNativeAsmPrinter();
