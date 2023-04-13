@@ -13,6 +13,9 @@ static LLVMTargetMachineRef machine = NULL;
 /* inner default module. */
 static LLVMModuleRef module = NULL;
 
+/* inner dfeault execution engine */
+static LLVMExecutionEngineRef engine = NULL;
+
 /* inner default builder. */
 static LLVMBuilderRef builder = NULL;
 
@@ -72,6 +75,14 @@ void SetDefaultModule(char* name) {
   LLVMSetDataLayout(module, LLVMCopyStringRepOfTargetData(layout));
   LLVMDisposeTargetData(layout);
 
+  char* message = NULL;
+  LLVMCreateJITCompilerForModule(&engine, module, 2, &message);
+  if (engine == NULL) {
+    fprintf(stderr, "Create JIT compiler failed: %s\n", message);
+    LLVMDisposeMessage(message);
+    exit(EXIT_FAILURE);
+  }
+
   builder = LLVMCreateBuilder();
 }
 
@@ -98,6 +109,15 @@ LLVMValueRef DeclareGlobalVariableWithValue(char* name, LLVMTypeRef type, LLVMVa
  */
 LLVMValueRef DeclareFunction(char* name, LLVMTypeRef type) {
   return LLVMAddFunction(module, name, type);
+}
+
+/**
+ * Add external function to execution engine.
+ */
+LLVMValueRef DeclareExternalFunction(char* name, LLVMTypeRef type, void* value) {
+  LLVMValueRef fn = DeclareFunction(name, type);
+  LLVMAddGlobalMapping(engine, fn, value);
+  return fn;
 }
 
 /* Global Variables */
@@ -273,14 +293,6 @@ void EmitObjectFile(char* filename) {
  * Run machine code of main function with MCJIT execution engine.
  */
 void ExecuteMachineCode() {
-  LLVMExecutionEngineRef engine = NULL;
-  char* message = NULL;
-  LLVMCreateJITCompilerForModule(&engine, module, 2, &message);
-  if (engine == NULL) {
-    fprintf(stderr, "Create JIT compiler failed: %s\n", message);
-    LLVMDisposeMessage(message);
-    exit(EXIT_FAILURE);
-  }
   int (*fn)(void) = (int(*)(void))LLVMGetFunctionAddress(engine, "main");
   fn();
 }

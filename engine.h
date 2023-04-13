@@ -21,6 +21,7 @@ void SetDefaultModule(char*);
 LLVMValueRef DeclareGlobalVariable(char*, LLVMTypeRef);
 LLVMValueRef DeclareGlobalVariableWithValue(char*, LLVMTypeRef, LLVMValueRef);
 LLVMValueRef DeclareFunction(char*, LLVMTypeRef);
+LLVMValueRef DeclareExternalFunction(char*, LLVMTypeRef, void*);
 
 LLVMValueRef CreateZeroInitializer(LLVMTypeRef, int);
 

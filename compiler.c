@@ -77,9 +77,9 @@ static struct {
 /**
  * Import function.
  */
-static LLVMValueRef DefineFunction(Symbol symbol, char* name, LLVMTypeRef type) {
+static LLVMValueRef DefineFunction(Symbol symbol, char* name, LLVMTypeRef type, void* value) {
   SymbolTable.types[symbol] = type;
-  SymbolTable.values[symbol] = DeclareFunction(name, type);
+  SymbolTable.values[symbol] = value == NULL ? DeclareFunction(name, type) : DeclareExternalFunction(name, type, value);
   return SymbolTable.values[symbol];
 }
 
@@ -221,7 +221,7 @@ void TearDownCompiler(void) {
  * Setup brainfuck skeleton.
  * - declare getchar.
  * - declare putchar.
- * - declare llvm.smax.i32.
+ * - declare max.
  * - declare global data segment.
  * - create data pointer.
  */
@@ -270,13 +270,24 @@ void Compile(char* source) {
   // Global Variables
   LLVMValueRef ds = DefineDataSegment();
 
+  // External Functions
+  DefineFunction(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False), getchar);
+  DefineFunction(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False), putchar);
+
   // Global Functions
-  DefineFunction(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
-  DefineFunction(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False));
-  DefineFunction(s_max, "llvm.smax.i32", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False));
+  LLVMValueRef max = DefineFunction(s_max, "max", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False), NULL);
+  EnterBlock(CreateAndAppendBlock(max));
+  LLVMValueRef condition = Compare(LLVMIntSGT, LLVMGetParam(max, 0), LLVMGetParam(max, 1));
+  LLVMBasicBlockRef then = CreateAndAppendBlock(max);
+  LLVMBasicBlockRef otherwise = CreateAndAppendBlock(max);
+  If(condition, then, otherwise);
+  EnterBlock(then);
+  Return(LLVMGetParam(max, 0));
+  EnterBlock(otherwise);
+  Return(LLVMGetParam(max, 1));
 
   // Main Begin
-  DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False));
+  DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False), NULL);
   EnterBlock(NewBlock());
 
   dp = Alloc(Int8PointerType);
