@@ -1,8 +1,16 @@
 #ifndef __LINKER_H_
 #define __LINKER_H_
 
-#include "config.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void Link(char*, char*);
+  void TearDownLinker(void);
+  void SetUpLinker(void);
+  void Link(char*, char*);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

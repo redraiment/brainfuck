@@ -22,6 +22,9 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 * [x] Creating executable file with linker.
 * [x] Running script file with [LLVM MCJIT](https://llvm.org/doxygen/group__LLVMCExecutionEngine.html).
 * [x] Deploying with [docker](https://hub.docker.com/).
+* [x] Linking with [lld](https://lld.llvm.org/).
+* [x] Static linking with [musl](https://musl.libc.org/).
+* [ ] Release deb package.
 
 # Getting Started
 
@@ -36,7 +39,7 @@ docker run --rm redraiment/brainfuck brainfuck -v
 You can see below version information if the above command run success.
 
 ```
-brainfuck v0.2.0
+brainfuck v0.3.0
 
 Home page: <https://github.com/redraiment/brainfuck/>.
 E-mail bug reports to: <redraiment@gmail.com>.
@@ -45,8 +48,8 @@ E-mail bug reports to: <redraiment@gmail.com>.
 Example for creating executable file and run it then:
 
 ```sh
-docker run --rm -v $PWD:/root/ redraiment/brainfuck brainfuck hello-world.bf
-docker run --rm -v $PWD:/root/ redraiment/brainfuck ./hello-world
+docker run --rm -v $PWD:/workspaces/ redraiment/brainfuck brainfuck hello-world.bf
+docker run --rm -v $PWD:/workspaces/ redraiment/brainfuck ./hello-world
 ```
 
 ## Install with Source Code
@@ -66,9 +69,9 @@ sudo apt install binutils flex bison clang llvm make
 Build program:
 
 ```
-wget https://github.com/redraiment/brainfuck/releases/download/v0.2.0/brainfuck-0.2.0.tar.gz
-tar xvf brainfuck-0.2.0.tar.gz
-cd brainfuck-0.2.0
+wget https://github.com/redraiment/brainfuck/releases/download/v0.3.0/brainfuck-0.3.0.tar.gz
+tar xvf brainfuck-0.3.0.tar.gz
+cd brainfuck-0.3.0
 ./configure CC=clang
 make
 sudo make install

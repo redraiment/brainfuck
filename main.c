@@ -23,7 +23,9 @@ int main(int argc, char* argv[]) {
     break;
   default:
     EmitObjectFile(options.object);
+    SetUpLinker();
     Link(options.object, options.output);
+    TearDownLinker();
     break;
   }
   TearDownCompiler();

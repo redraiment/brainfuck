@@ -1,7 +1,7 @@
 # Brainfuck autoconf input script.
 
 AC_PREREQ([2.71])
-AC_INIT([brainfuck], [0.2.0],
+AC_INIT([brainfuck], [0.3.0],
         [redraiment@gmail.com],
         AC_PACKAGE_NAME[-]AC_PACKAGE_VERSION,
         [https://github.com/redraiment/brainfuck/])
@@ -24,6 +24,7 @@ FIND_PROGRAM([LEX], [flex])
 FIND_PROGRAM([YACC], [bison])
 FIND_PROGRAM([LLVM_CONFIG], [llvm-config])
 FIND_PROGRAM([LINKER], [ld.lld])
+FIND_PROGRAM([CXX], [clang++])
 
 # Checks for library functions.
 AC_CHECK_FUNCS([calloc free exit strlen strrchr])
@@ -33,6 +34,8 @@ AC_CHECK_HEADER([stdio.h])
 AC_CHECK_HEADER([string.h])
 AC_CHECK_HEADER([stdlib.h])
 AC_CHECK_HEADER([getopt.h])
+AC_CHECK_HEADER([dirent.h])
+AC_CHECK_HEADER([unistd.h])
 AC_CHECK_HEADER([llvm-c/Core.h])
 AC_CHECK_HEADER([llvm-c/ExecutionEngine.h])
 AC_CHECK_HEADER([llvm-c/Target.h])
