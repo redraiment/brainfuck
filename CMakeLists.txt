@@ -18,7 +18,6 @@ else()
   message(STATUS "CLANGXX_EXECUTABLE=${CLANGXX_EXECUTABLE}")
 endif()
 set(CMAKE_CXX_COMPILER "${CLANGXX_EXECUTABLE}")
-message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 set(CMAKE_CXX_STANDARD 14)
 
 # Flex & Bison
@@ -30,7 +29,6 @@ bison_target(PARSER "parser.y" "parser.c" DEFINES_FILE "parser.h")
 add_flex_bison_dependency(SCANNER PARSER)
 
 # llvm-config
-unset(LLVM_CONFIG_EXECUTABLE)
 find_program(LLVM_CONFIG_EXECUTABLE NAMES llvm-config llvm-config-15 llvm-config-14 llvm-config-13 llvm-config-12 llvm-config-11 llvm-config-10)
 if (NOT LLVM_CONFIG_EXECUTABLE)
   message(FATAL_ERROR "llvm-config not found. Make suer LLVM is installed and in your path.")
