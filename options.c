@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -24,7 +25,7 @@ static struct option configs[] = {
  */
 struct _Options options = {
   LinkMode,
-  False,
+  false,
   NULL,
   NULL,
   NULL,
@@ -47,7 +48,7 @@ static void TearDownOptions(void) {
 /**
  * Create file name: strip the source file's extension and append with suffix.
  */
-static char* CopyFileName(char* source, Boolean withExtension, char* suffix) {
+static char* CopyFileName(char* source, bool withExtension, char* suffix) {
   char* begin = strrchr(source, '/');
   if (begin == NULL) {
     begin = source;
@@ -70,8 +71,8 @@ static char* CopyFileName(char* source, Boolean withExtension, char* suffix) {
  * Show bug report and exit.
  */
 static void BugReport(void) {
-  fprintf(stderr, "Home page: <%s>.\n", PACKAGE_URL);
-  fprintf(stderr, "E-mail bug reports to: <%s>.\n", PACKAGE_BUGREPORT);
+  fprintf(stderr, "Home page: <%s>.\n", PROJECT_HOMEPAEG_URL);
+  fprintf(stderr, "E-mail bug reports to: <%s>.\n", PROJECT_BUG_REPORT);
   exit(EXIT_FAILURE);
 }
 
@@ -81,7 +82,7 @@ static void BugReport(void) {
 static void Help(void) {
   fprintf(stderr, "Overview: brainfuck compiler and interpreter.\n\n");
 
-  fprintf(stderr, "Usage: %s [OPTIONS] <source-file>\n\n", PACKAGE_NAME);
+  fprintf(stderr, "Usage: %s [OPTIONS] <source-file>\n\n", PROJECT_NAME);
 
   fprintf(stderr, "  It will create an executable file without options.\n\n");
 
@@ -133,7 +134,7 @@ static void Help(void) {
  * Show version and exit.
  */
 void Version(void) {
-  fprintf(stderr, "%s v%s\n\n", PACKAGE_NAME, PACKAGE_VERSION);
+  fprintf(stderr, "%s v%s\n\n", PROJECT_NAME, PROJECT_VERSION);
 
   BugReport();
 }
@@ -144,7 +145,7 @@ void Version(void) {
 void ParseCommandLineArguments(int argc, char* argv[]) {
   atexit(TearDownOptions);
 
-  while (True) {
+  while (true) {
     int index = 0;
     int charactor = getopt_long(argc, argv, "crsmo:hv", configs, &index);
     if (charactor < 0) {
@@ -182,15 +183,15 @@ void ParseCommandLineArguments(int argc, char* argv[]) {
     Help();
   }
 
-  options.object = CopyFileName(options.source, False, ".o");
+  options.object = CopyFileName(options.source, false, ".o");
   if (options.output == NULL) {
     if (options.mode == CompileMode) {
-      options.output = CopyFileName(options.source, False, ".o");
+      options.output = CopyFileName(options.source, false, ".o");
     } else if (options.mode == LinkMode) {
-      options.output = CopyFileName(options.source, False, "");
+      options.output = CopyFileName(options.source, false, "");
     }
   } else {
     // Clone a copy
-    options.output = CopyFileName(options.output, False, "");
+    options.output = CopyFileName(options.output, false, "");
   }
 }

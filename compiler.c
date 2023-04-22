@@ -1,6 +1,7 @@
 /**
  * Brainfuck language command builder.
  */
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "engine.h"
@@ -271,11 +272,11 @@ void Compile(char* source) {
   LLVMValueRef ds = DefineDataSegment();
 
   // External Functions
-  DefineFunction(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False), getchar);
-  DefineFunction(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, False), putchar);
+  DefineFunction(s_getchar, "getchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, false), getchar);
+  DefineFunction(s_putchar, "putchar", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type() }, 1, false), putchar);
 
   // Global Functions
-  LLVMValueRef max = DefineFunction(s_max, "max", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, False), NULL);
+  LLVMValueRef max = DefineFunction(s_max, "max", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){ LLVMInt32Type(), LLVMInt32Type() }, 2, false), NULL);
   EnterBlock(CreateAndAppendBlock(max));
   LLVMValueRef condition = Compare(LLVMIntSGT, LLVMGetParam(max, 0), LLVMGetParam(max, 1));
   LLVMBasicBlockRef then = CreateAndAppendBlock(max);
@@ -287,7 +288,7 @@ void Compile(char* source) {
   Return(LLVMGetParam(max, 1));
 
   // Main Begin
-  DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, False), NULL);
+  DefineFunction(s_main, "main", LLVMFunctionType(LLVMInt32Type(), (LLVMTypeRef[]){}, 0, false), NULL);
   EnterBlock(NewBlock());
 
   dp = Alloc(Int8PointerType);

@@ -4,6 +4,12 @@
 *.o
 *.ll
 
+# Ignore Output of cmake
+
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
 # Ignore Output of autoconf
 
 autom4te.cache/

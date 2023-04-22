@@ -1,6 +1,7 @@
 /**
  * Compiler engine: wrap LLVM with single module.
  */
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -127,7 +128,7 @@ LLVMValueRef DeclareExternalFunction(char* name, LLVMTypeRef type, void* value) 
  */
 LLVMValueRef CreateZeroInitializer(LLVMTypeRef elementType, int length) {
   LLVMTypeRef type = LLVMArrayType(elementType, length);
-  LLVMValueRef zero = LLVMConstInt(elementType, 0, False);
+  LLVMValueRef zero = LLVMConstInt(elementType, 0, false);
   LLVMValueRef values[length];
   for (int index = 0; index < length; index++) {
     values[index] = zero;

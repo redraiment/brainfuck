@@ -6,13 +6,11 @@
 #include <llvm-c/TargetMachine.h>
 #include <llvm-c/ExecutionEngine.h>
 
-#include "config.h"
-
 #define EMPTY_SPACE 0
 #define Int8PointerType LLVMPointerType(LLVMInt8Type(), EMPTY_SPACE)
 
-#define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), False)
-#define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), False)
+#define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), false)
+#define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), false)
 
 void TearDownEngine(void);
 void SetUpEngine();

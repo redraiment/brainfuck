@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "ast.h"
@@ -67,7 +68,7 @@ void DisposeAst(Ast ast) {
 /**
  * The Mergeable attribute of instruction symbol.
  */
-static Boolean MergeableInstructions[] = { True, True, False, False };
+static bool MergeableInstructions[] = { true, true, false, false };
 
 /**
  * Return if the nodes are same (same node type and same instruction symbol)

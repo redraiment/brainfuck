@@ -1,7 +1,10 @@
 #ifndef __OPTIONS_H_
 #define __OPTIONS_H_
 
-#include "config.h"
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define PROJECT_VERSION "@PROJECT_VERSION@"
+#define PROJECT_HOMEPAEG_URL "@PROJECT_HOMEPAGE_URL@"
+#define PROJECT_BUG_REPORT "@PROJECT_BUG_REPORT@"
 
 /**
  * Executing mode.
