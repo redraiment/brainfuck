@@ -9,6 +9,7 @@
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+options.h
 
 # Ignore Output of autoconf
 

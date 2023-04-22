@@ -12,7 +12,8 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 
 # Roadmap
 
-* [x] Generating Makefile with [GNU Autoconf](https://www.gnu.org/software/autoconf/).
+* [x] ~~Generating Makefile with [GNU Autoconf](https://www.gnu.org/software/autoconf/).~~
+* [x] Generating Makefile with [CMake](https://cmake.org/).
 * [x] Building project with [GNU Make](https://www.gnu.org/software/make/).
 * [x] Parsing Command line options with [getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html).
 * [x] Lexical analysis with [flex](https://github.com/westes/flex).
@@ -24,6 +25,7 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 * [x] Deploying with [docker](https://hub.docker.com/).
 * [x] Linking with [lld](https://lld.llvm.org/).
 * [x] Static linking with [musl](https://musl.libc.org/).
+* [ ] Embedding C runtime library.
 * [ ] Release deb package.
 
 # Getting Started
@@ -39,7 +41,7 @@ docker run --rm redraiment/brainfuck brainfuck -v
 You can see below version information if the above command run success.
 
 ```
-brainfuck v0.3.0
+brainfuck v0.4.0
 
 Home page: <https://github.com/redraiment/brainfuck/>.
 E-mail bug reports to: <redraiment@gmail.com>.
@@ -54,27 +56,19 @@ docker run --rm -v $PWD:/workspaces/ redraiment/brainfuck ./hello-world
 
 ## Install with Source Code
 
-Install packages on ArchLinux:
+Install packages on Ubuntu:
 
 ```sh
-sudo pacman -S binutils flex bison clang llvm make
-```
-
-Install packages on Ubuntu / Debain:
-
-```sh
-sudo apt install binutils flex bison clang llvm make
+sudo apt install --no-install-recommends -y flex bison clang-15 lld-15 liblld-15-dev llvm-15 llvm-15-dev llvm-15-tools zlib1g-dev libtinfo-dev binutils-dev musl-dev make cmake
 ```
 
 Build program:
 
 ```
-wget https://github.com/redraiment/brainfuck/releases/download/v0.3.0/brainfuck-0.3.0.tar.gz
-tar xvf brainfuck-0.3.0.tar.gz
-cd brainfuck-0.3.0
-./configure CC=clang
+git clone --depth=1 https://github.com/redraiment/brainfuck.git
+cd brainfuck
+cmake 'Unix Makefiles' .
 make
-sudo make install
 ```
 
 # Usage
@@ -193,8 +187,9 @@ Distrubuted under the GPLv3 License. See `LICENSE` for more information.
 * [Wikipedia](https://en.wikipedia.org/)
 * [brainfuck.org](http://brainfuck.org/)
 * [LLVM.org](https://llvm.org/)
+* [CMake](https://cmake.org/)
 * [GNU](https://www.gnu.org/)
-  * [GNU Autoconf](https://www.gnu.org/software/autoconf/)
+  * ~~[GNU Autoconf](https://www.gnu.org/software/autoconf/)~~
   * [GNU Make](https://www.gnu.org/software/make/)
   * [GNU getopt](https://www.gnu.org/software/libc/manual/html_node/Getopt.html)
   * [GNU bison](https://www.gnu.org/software/bison/).
