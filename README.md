@@ -34,7 +34,7 @@ The program can only working on Linux for now.
 ## Download pre-build binary file (Recommended)
 
 ```sh
-wget https://github.com/redraiment/brainfuck/releases/download/v0.5.0/brainfuck-0.5.0.x86_64.gz
+wget https://github.com/redraiment/brainfuck/releases/download/v0.5.0/brainfuck-0.5.0-x86_64.gz
 gunzip brainfuck-0.5.0.x86_64.gz
 sudo mv brainfuck-0.5.0.x86_64 /usr/local/bin/brainfuck
 brainfuck -v
