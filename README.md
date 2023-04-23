@@ -41,7 +41,7 @@ docker run --rm redraiment/brainfuck brainfuck -v
 You can see below version information if the above command run success.
 
 ```
-brainfuck v0.4.0
+brainfuck v0.4.2
 
 Home page: <https://github.com/redraiment/brainfuck/>.
 E-mail bug reports to: <redraiment@gmail.com>.
