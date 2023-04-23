@@ -12,6 +12,10 @@
 #define Int32(n) LLVMConstInt(LLVMInt32Type(), (n), false)
 #define Int8(n) LLVMConstInt(LLVMInt8Type(), (n), false)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void TearDownEngine(void);
 void SetUpEngine();
 void SetDefaultModule(char*);
@@ -47,5 +51,9 @@ LLVMValueRef TruncateType(LLVMValueRef, LLVMTypeRef);
 void EmitIntermediateRepresentation(char*);
 void EmitObjectFile(char*);
 void ExecuteMachineCode(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

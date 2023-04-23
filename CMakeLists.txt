@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 # Workaround to prevent project() from enabling default languages
 set(CMAKE_NONE_STANDARD_COMPUTE "")
 project(brainfuck
-  VERSION 0.4.2
+  VERSION 0.5.0
   DESCRIPTION "Brainfuck Compiler and Interpreter with LLVM in C"
   HOMEPAGE_URL "https://github.com/redraiment/brainfuck/"
   LANGUAGES "NONE"
@@ -54,17 +54,47 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld -static ${LLV
 
 # Libraries Setup
 
-find_library(LIB_LLD_COMMON lldCommon HINTS ${LLVM_LIBRARY_DIR})
-if(NOT LIB_LLD_COMMON)
-  message(FATAL_ERROR "liblldCommon.a not found")
-endif()
+## LLD libraries
 
-find_library(LIB_LLD_ELF lldELF HINTS ${LLVM_LIBRARY_DIR})
-if(NOT LIB_LLD_ELF)
-  message(FATAL_ERROR "liblldELF.a not found")
-endif()
+find_library(LIB_LLD_COMMON lldCommon REQUIRED HINTS ${LLVM_LIBRARY_DIR})
+find_library(LIB_LLD_ELF lldELF REQUIRED HINTS ${LLVM_LIBRARY_DIR})
+
+## CRT libraries
+
+find_program(XXD_EXECUTABLE NAMES xxd REQUIRED)
+set(CRT_C_FILE "${CMAKE_CURRENT_BINARY_DIR}/crt.c")
+file(WRITE "${CRT_C_FILE}" "#include \"crt.h\"\n\n")
+
+function(import_musl_library FILE_NAME)
+  find_file(MUSL_LIBRARY_FILE
+    NAMES ${FILE_NAME}
+    HINTS ${MUSL_PATH}
+    /usr/lib/x86_64-linux-musl /usr/lib/i386-linux-musl # ubuntu/debian
+    /usr/x86_64-linux-musl/lib64 /usr/i386-linux-musl/lib # centos/rhel
+    /usr/lib/musl/lib # archlinux
+  )
+  string(REGEX REPLACE "/[^/]*$" "/" VARIABLE_PREFIX "${MUSL_LIBRARY_FILE}")
+  string(REGEX REPLACE "[-/.]" "_" VARIABLE_PREFIX "${VARIABLE_PREFIX}")
+  string(TOUPPER "${VARIABLE_PREFIX}" VARIABLE_PREFIX)
+
+  if (MUSL_LIBRARY_FILE)
+    execute_process(COMMAND ${XXD_EXECUTABLE} -C -i ${MUSL_LIBRARY_FILE} OUTPUT_VARIABLE MUSL_LIBRARY_CONTENT)
+    string(REPLACE "${VARIABLE_PREFIX}" "" MUSL_LIBRARY_CONTENT "${MUSL_LIBRARY_CONTENT}")
+    file(APPEND "${CRT_C_FILE}" "${MUSL_LIBRARY_CONTENT}\n")
+  else()
+    message(FATAL_ERROR "MUSL library `${FILE_NAME}' not found, specify `MUSL_PATH' for search.")
+  endif()
+  unset(MUSL_LIBRARY_FILE CACHE)
+  unset(VARIABLE_PREFIX CACHE)
+  unset(MUSL_LIBRARY_CONTENT CACHE)
+endfunction()
+
+import_musl_library(Scrt1.o)
+import_musl_library(crti.o)
+import_musl_library(crtn.o)
+import_musl_library(libc.a)
 
 # Target
 
-add_executable(brainfuck "${SRC_DIR}/ast.c" "${SRC_DIR}/compiler.c" "${SRC_DIR}/engine.c" "${SRC_DIR}/linker.cpp" "${SRC_DIR}/options.c" "${SRC_DIR}/main.c" "${FLEX_SCANNER_OUTPUTS}" "${BISON_PARSER_OUTPUTS}")
+add_executable(brainfuck "${SRC_DIR}/ast.c" "${SRC_DIR}/compiler.c" "${SRC_DIR}/engine.c" "${SRC_DIR}/fs.cpp" "${SRC_DIR}/linker.cpp" "${SRC_DIR}/options.c" "${SRC_DIR}/main.c" "${FLEX_SCANNER_OUTPUTS}" "${BISON_PARSER_OUTPUTS}" "${CRT_C_FILE}")
 target_link_libraries(brainfuck PRIVATE ${LLVM_SYSTEM_LIBS} ${LLVM_LIBS} ${LIB_LLD_COMMON} ${LIB_LLD_ELF})

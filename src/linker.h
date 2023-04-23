@@ -7,7 +7,7 @@ extern "C" {
 
   void TearDownLinker(void);
   void SetUpLinker(void);
-  void Link(char*, char*);
+  void Link(char*);
 
 #ifdef __cplusplus
 }

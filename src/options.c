@@ -28,17 +28,12 @@ struct _Options options = {
   false,
   NULL,
   NULL,
-  NULL,
 };
 
 /**
  * Free file name spaces.
  */
 static void TearDownOptions(void) {
-  if (options.object != NULL) {
-    free(options.object);
-    options.object = NULL;
-  }
   if (options.output != NULL) {
     free(options.output);
     options.output = NULL;
@@ -52,6 +47,8 @@ static char* CopyFileName(char* source, bool withExtension, char* suffix) {
   char* begin = strrchr(source, '/');
   if (begin == NULL) {
     begin = source;
+  } else {
+    begin = begin + 1;
   }
   char* end = withExtension ? NULL : strrchr(begin, '.');
   if (end == NULL) {
@@ -183,7 +180,6 @@ void ParseCommandLineArguments(int argc, char* argv[]) {
     Help();
   }
 
-  options.object = CopyFileName(options.source, false, ".o");
   if (options.output == NULL) {
     if (options.mode == CompileMode) {
       options.output = CopyFileName(options.source, false, ".o");

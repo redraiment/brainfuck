@@ -22,9 +22,8 @@ int main(int argc, char* argv[]) {
     EmitIntermediateRepresentation(options.output);
     break;
   default:
-    EmitObjectFile(options.object);
     SetUpLinker();
-    Link(options.object, options.output);
+    Link(options.output);
     TearDownLinker();
     break;
   }

@@ -25,23 +25,25 @@ There are so many LLVM tutorials in C++, however, I'd like to build a compiler a
 * [x] Deploying with [docker](https://hub.docker.com/).
 * [x] Linking with [lld](https://lld.llvm.org/).
 * [x] Static linking with [musl](https://musl.libc.org/).
-* [ ] Embedding C runtime library.
-* [ ] Release deb package.
+* [x] Embedding C runtime library.
 
 # Getting Started
 
 The program can only working on Linux for now.
 
-## Running using Docker (Recommended)
+## Download pre-build binary file (Recommended)
 
 ```sh
-docker run --rm redraiment/brainfuck brainfuck -v
+wget https://github.com/redraiment/brainfuck/releases/download/v0.5.0/brainfuck-0.5.0.x86_64.gz
+gunzip brainfuck-0.5.0.x86_64.gz
+sudo mv brainfuck-0.5.0.x86_64 /usr/local/bin/brainfuck
+brainfuck -v
 ```
 
 You can see below version information if the above command run success.
 
 ```
-brainfuck v0.4.2
+brainfuck v0.5.0
 
 Home page: <https://github.com/redraiment/brainfuck/>.
 E-mail bug reports to: <redraiment@gmail.com>.
@@ -50,25 +52,22 @@ E-mail bug reports to: <redraiment@gmail.com>.
 Example for creating executable file and run it then:
 
 ```sh
-docker run --rm -v $PWD:/workspaces/ redraiment/brainfuck brainfuck hello-world.bf
-docker run --rm -v $PWD:/workspaces/ redraiment/brainfuck ./hello-world
+brainfuck hello-world.bf
+./hello-world
 ```
+
+You can find the `hello-world.bf` in [test](https://github.com/redraiment/brainfuck/tree/main/test) folder.
 
 ## Install with Source Code
 
-Install packages on Ubuntu:
+An example on Ubuntu:
 
 ```sh
-sudo apt install --no-install-recommends -y flex bison clang-15 lld-15 liblld-15-dev llvm-15 llvm-15-dev llvm-15-tools zlib1g-dev libtinfo-dev binutils-dev musl-dev make cmake
-```
-
-Build program:
-
-```
+sudo apt install --no-install-recommends -y flex bison clang-15 lld-15 liblld-15-dev llvm-15 llvm-15-dev llvm-15-tools zlib1g-dev libtinfo-dev binutils-dev musl-dev xxd make cmake
 git clone --depth=1 https://github.com/redraiment/brainfuck.git
 cd brainfuck
-cmake 'Unix Makefiles' .
-make
+cmake 'Unix Makefiles' -B build .
+cmake --build build
 ```
 
 # Usage

@@ -9,113 +9,68 @@
 #include <lld/Common/Driver.h>
 #include <lld/Common/LLVM.h>
 
+#include "crt.h"
+#include "engine.h"
+#include "fs.h"
 #include "linker.h"
 
-static const char* MUSL_LIBRARY_FOLDERS[] = {
-  // debian/ubuntu
-  "/usr/lib/x86_64-linux-musl",
-  "/usr/lib/i386-linux-musl",
-  // centos/rhel
-  "/usr/x86_64-linux-musl/lib64/",
-  "/usr/i386-linux-musl/lib/",
-  // archlinux
-  "/usr/lib/musl/lib",
-  // alpine
-  "/usr/lib/"
-};
-static const char* MUSL_LIBRARY_FILES[] = {
-  "Scrt1.o",
-  "crti.o",
-  "crtn.o",
-  "libc.a"
-};
-
-static int MUSL_LIBRARY_FOLDER_SIZE = sizeof(MUSL_LIBRARY_FOLDERS) / sizeof(char*);
-static int MUSL_LIBRARY_FILES_SIZE = sizeof(MUSL_LIBRARY_FILES) / sizeof(char*);
-
-static char const * MUSL_HOME = NULL;
-static char** MUSL_LIBRARY_PATHS = NULL;
+static char* crt1 = NULL;
+static char* crti = NULL;
+static char* crtn = NULL;
+static char* libc = NULL;
 
 /**
- * Check if the specified folder exists.
- */
-static bool FolderExists(const char* path) {
-  DIR* dir = opendir(path);
-  if (dir != NULL) {
-    closedir(dir);
-    return true;
-  }
-  return false;
-}
-
-/**
- * Check if the specified file exists.
- */
-static bool FileExists(const char* path) {
-  return access(path, F_OK) == 0;
-}
-
-/**
- * Shutdown linker and clear memory.
- */
+* Shutdown linker and clear memory. // // 
+*/
 void TearDownLinker() {
-  if (MUSL_LIBRARY_PATHS != NULL) {
-    for (int index = 0; index < MUSL_LIBRARY_FILES_SIZE; index++) {
-      free(MUSL_LIBRARY_PATHS[index]);
-    }
-    free(MUSL_LIBRARY_PATHS);
-    MUSL_LIBRARY_PATHS = NULL;
+  DeleteTemporaryFile(crt1);
+  DeleteTemporaryFile(crti);
+  DeleteTemporaryFile(crtn);
+  DeleteTemporaryFile(libc);
+}
+
+static char* SaveToTemporaryFile(unsigned char* content, unsigned int length) {
+  char* path = CreateTemporaryFileName();
+  FILE* file = fopen(path, "wb");
+  if (file != NULL) {
+    fwrite(content, sizeof(unsigned char), length, file);
+    fclose(file);
+  } else {
+    fprintf(stderr, "Generate C Runtime Library files failed!\n");
+    exit(EXIT_FAILURE);
   }
+  return path;
 }
 
 /**
  * Search and initialize musl library path.
  */
 void SetUpLinker() {
-  MUSL_HOME = getenv("MUSL_HOME");
-  if (MUSL_HOME == NULL) {
-    for (int index = 0; index < MUSL_LIBRARY_FOLDER_SIZE; index++) {
-      if (FolderExists(MUSL_LIBRARY_FOLDERS[index])) {
-        MUSL_HOME = MUSL_LIBRARY_FOLDERS[index];
-        break;
-      }
-    }
-  } else if (!FolderExists(MUSL_HOME)) {
-    MUSL_HOME = NULL;
-  }
-
-  if (MUSL_HOME == NULL) {
-    fprintf(stderr, "Cannot found musl library, specify it via environment variable `MUSL_HOME'.\n");
-    exit(EXIT_FAILURE);
-  }
-
-  int length = strlen(MUSL_HOME);
-  MUSL_LIBRARY_PATHS = (char**)calloc(MUSL_LIBRARY_FILES_SIZE, sizeof(char*));
-  for (int index = 0; index < MUSL_LIBRARY_FILES_SIZE; index++) {
-    const char* file = MUSL_LIBRARY_FILES[index];
-    MUSL_LIBRARY_PATHS[index] = (char*)calloc(length + strlen(file) + 2, sizeof(char));
-    sprintf(MUSL_LIBRARY_PATHS[index], "%s/%s", MUSL_HOME, file);
-    if (!FileExists(MUSL_LIBRARY_PATHS[index])) {
-      fprintf(stderr, "Cannot found %s under %s.\n", file, MUSL_HOME);
-      exit(EXIT_FAILURE);
-    }
-  }
+  crt1 = SaveToTemporaryFile(SCRT1_O, SCRT1_O_LEN);
+  crti = SaveToTemporaryFile(CRTI_O, CRTI_O_LEN);
+  crtn = SaveToTemporaryFile(CRTN_O, CRTN_O_LEN);
+  libc = SaveToTemporaryFile(LIBC_A, LIBC_A_LEN);
 }
 
 /**
  * Link the object file to executable ELF file.
  */
-void Link(char* object, char* program) {
-  std::vector<const char *> args;
+void Link(char* program) {
+  char* object = CreateTemporaryFileName();
+  EmitObjectFile(object);
 
+  std::vector<const char *> args;
   args.push_back("ld.lld");
   args.push_back("-static");
   args.push_back("-o");
   args.push_back(program);
-  for (int index = 0; index < MUSL_LIBRARY_FILES_SIZE; index++) {
-    args.push_back(MUSL_LIBRARY_PATHS[index]);
-  }
+  args.push_back(crt1);
+  args.push_back(crti);
   args.push_back(object);
+  args.push_back(libc);
+  args.push_back(crtn);
 
   lld::elf::link(args, llvm::outs(), llvm::errs(), false, false);
+
+  DeleteTemporaryFile(object);
 }

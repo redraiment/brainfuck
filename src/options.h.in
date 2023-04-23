@@ -34,10 +34,6 @@ typedef struct _Options {
    */
   char* source;
   /**
-   * Object filename.
-   */
-  char* object;
-  /**
    * Output filename.
    */
   char* output;
