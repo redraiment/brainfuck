@@ -1,6 +1,5 @@
 # Ignore testing files
 
-*.bf
 *.o
 *.ll
 
